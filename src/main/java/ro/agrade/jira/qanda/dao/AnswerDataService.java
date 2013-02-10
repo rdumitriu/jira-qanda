@@ -15,18 +15,26 @@ import java.util.List;
  */
 public interface AnswerDataService {
     /**
-     * Gets all the answers for the issue in question
+     * Gets all the answers for the question
      * @param qid the question id
      * @return the list of answers
      */
     public abstract List<Answer> getAnswersForQuestion(long qid);
 
     /**
+     * Gets all the answers for the issue
+     * @param issueId the issue id
+     * @return the list of answers
+     */
+    public abstract List<Answer> getAnswersForIssue(long issueId);
+
+    /**
      * Add an answer
      * @param qid the question id
+     * @param issueId the issue id
      * @param answer the answer text
      */
-    public abstract void addAnswer(long qid, String answer);
+    public abstract void addAnswer(long qid, long issueId, String answer);
 
     /**
      * Removes an answer

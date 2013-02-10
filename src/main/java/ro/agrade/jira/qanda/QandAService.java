@@ -20,13 +20,14 @@ public interface QandAService {
      */
     public abstract List<Question> loadQuestionsForIssue(String key);
 
-    /**
-     * Get all the questions which are unresolved for the specified project
-     *
-     * @param project the project
-     * @return the project questions
-     */
-    public abstract List<Question> getUnsolvedQuestionsForProject(String project);
+//::TODO:: PANEL
+//    /**
+//     * Get all the questions which are unresolved for the specified project
+//     *
+//     * @param project the project
+//     * @return the project questions
+//     */
+//    public abstract List<Question> getUnsolvedQuestionsForProject(String project);
 
     /**
      * Adds a question
@@ -44,9 +45,10 @@ public interface QandAService {
     /**
      * Add an answer to a question
      * @param qid the question id
+     * @param issueKey the issue key
      * @param answer the text
      */
-    public abstract void addAnswer(long qid, String answer);
+    void addAnswer(long qid, String issueKey, String answer);
 
     /**
      * Deletes an answer

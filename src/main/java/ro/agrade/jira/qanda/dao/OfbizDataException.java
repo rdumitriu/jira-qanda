@@ -1,14 +1,11 @@
 /*
- * Created at Jul 23, 2010, 9:51:32 AM
- *
  * File: OfbizDataException.java
  */
 package ro.agrade.jira.qanda.dao;
 
 /**
  * The exception thrown for ofbiz custom classes.
- * 
- * @author Maria Cirtog (mcirtog@kepler-rominfo.com)
+ *
  * @since 1.0
  */
 public class OfbizDataException extends RuntimeException {

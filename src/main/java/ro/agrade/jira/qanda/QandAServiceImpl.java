@@ -5,6 +5,9 @@ package ro.agrade.jira.qanda;
 
 import java.util.*;
 
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
+
 import ro.agrade.jira.qanda.dao.AnswerDataService;
 import ro.agrade.jira.qanda.dao.QuestionDataService;
 
@@ -19,12 +22,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QandAServiceImpl implements QandAService {
     private static final Log LOG = LogFactory.getLog(QandAServiceImpl.class);
-    private QuestionDataService qImpl;
-    private AnswerDataService aImpl;
+    private final QuestionDataService qImpl;
+    private final AnswerDataService aImpl;
+    private final IssueManager issueManager;
 
-    public QandAServiceImpl(QuestionDataService qImpl, AnswerDataService aImpl) {
+    public QandAServiceImpl(final IssueManager issueManager,
+                            final QuestionDataService qImpl,
+                            final AnswerDataService aImpl) {
         this.qImpl = qImpl;
         this.aImpl = aImpl;
+        this.issueManager = issueManager;
     }
 
     /**
@@ -38,52 +45,71 @@ public class QandAServiceImpl implements QandAService {
         if(LOG.isDebugEnabled()) {
             LOG.debug(String.format("Loading questions for issue %s", key));
         }
-        List<Question> questionList = qImpl.getQuestionsForIssue(key);
-        questionList = compileQuestionsWithAnswers(questionList);
+        Issue issue = issueManager.getIssueObject(key);
+        List<Question> questionList = qImpl.getQuestionsForIssue(issue.getId());
+        questionList = compileQuestionsWithAnswers(issue, questionList);
         if(LOG.isDebugEnabled()) {
             LOG.debug(String.format("Done loading questions for issue %s", key));
         }
-        return questionList;
-    }
-
-    private List<Question> compileQuestionsWithAnswers(List<Question> questionList) {
-        if(questionList != null) {
-            for(Question q : questionList) {
-                List<Answer> answers = aImpl.getAnswersForQuestion(q.getId());
-                if(answers != null) {
-                    Collections.sort(answers, new Comparator<Answer>() {
-                        @Override
-                        public int compare(Answer o1, Answer o2) {
-                            return (int)(o1.getAnswerId() - o2.getAnswerId());
-                        }
-                    });
-                }
-                q.setAnswers(answers);
+        Collections.sort(questionList, new Comparator<Question>() {
+            @Override
+            public int compare(Question o1, Question o2) {
+                return (int)(o2.getTimeStamp() - o1.getTimeStamp());
             }
-        } else {
-            questionList = new ArrayList<Question>();
+        });
+        return questionList;
+    }
+
+    // Unfortunately, Qfbiz simply doesn't know too much about joins
+    private List<Question> compileQuestionsWithAnswers(Issue issue, List<Question> questionList) {
+        if(questionList == null) {
+            return new ArrayList<Question>();
+        }
+        //manual hash join
+        Map<Long, Question> questionsMap = new HashMap<Long, Question>();
+        for(Question q : questionList) {
+            questionsMap.put(q.getId(), q);
+        }
+        List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
+        if(answers != null) {
+            for(Answer a : answers) {
+                Question q = questionsMap.get(a.getQuestionId());
+                if(q == null) {
+                    LOG.warn(String.format("Got answer %d, but could not find the question %d ?!?",
+                                           a.getAnswerId(), a.getQuestionId()));
+                    continue;
+                }
+                q.getAnswers().add(a);
+            }
         }
         return questionList;
     }
 
-    /**
-     * Get all the questions which are unresolved for the specified project
-     *
-     * @param project the project
-     * @return the project questions
-     */
-    @Override
-    public List<Question> getUnsolvedQuestionsForProject(String project) {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Loading questions for project %s", project));
-        }
-        List<Question> questionList = qImpl.getUnresolvedQuestionsForProject(project);
-        questionList = compileQuestionsWithAnswers(questionList);
-        if(LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Done loading questions for project %s", project));
-        }
-        return questionList;
-    }
+//    //::TODO:: PANEL
+//    /**
+//     * Get all the questions which are unresolved for the specified project
+//     *
+//     * @param project the project
+//     * @return the project questions
+//     */
+//    @Override
+//    public List<Question> getUnsolvedQuestionsForProject(String project) {
+//        if(LOG.isDebugEnabled()) {
+//            LOG.debug(String.format("Loading questions for project %s", project));
+//        }
+//        List<Question> questionList = qImpl.getUnresolvedQuestionsForProject(project);
+//        questionList = compileQuestionsWithAnswers(questionList);
+//        Collections.sort(questionList, new Comparator<Question>() {
+//            @Override
+//            public int compare(Question o1, Question o2) {
+//                return (int)(o1.getTimeStamp() - o2.getTimeStamp());
+//            }
+//        });
+//        if(LOG.isDebugEnabled()) {
+//            LOG.debug(String.format("Done loading questions for project %s", project));
+//        }
+//        return questionList;
+//    }
 
     /**
      * Adds a question
@@ -93,7 +119,8 @@ public class QandAServiceImpl implements QandAService {
      */
     @Override
     public void addQuestion(String issueKey, String question) {
-        qImpl.addQuestion(issueKey, question);
+        Issue issue = issueManager.getIssueObject(issueKey);
+        qImpl.addQuestion(issue.getId(), question);
     }
 
     /**
@@ -113,8 +140,9 @@ public class QandAServiceImpl implements QandAService {
      * @param answer the text
      */
     @Override
-    public void addAnswer(long qid, String answer) {
-        aImpl.addAnswer(qid, answer);
+    public void addAnswer(long qid, String issueKey, String answer) {
+        Issue issue = issueManager.getIssueObject(issueKey);
+        aImpl.addAnswer(qid, issue.getId(), answer);
     }
 
     /**

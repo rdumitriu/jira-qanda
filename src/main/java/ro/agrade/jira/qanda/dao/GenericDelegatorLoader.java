@@ -1,6 +1,4 @@
 /*
- * Created at Jul 19, 2010, 5:45:44 PM
- *
  * File: GenericDelegatorLoader.java
  */
 package ro.agrade.jira.qanda.dao;
@@ -247,7 +245,7 @@ public class GenericDelegatorLoader {
                                           String loaderEnt,
                                           String locationEnt) throws OfbizDataException {
 		if (modelReader == null || resourceHandler == null) {
-			LOG.warn(String.format("Null timereport reader or resource handler" +
+			LOG.warn(String.format("Null reader or resource handler" +
 					               " in addEntitiesToEntityCache() method. Model" +
                                    " reader: %s Resource handler: %s",
                                    modelReader, resourceHandler));

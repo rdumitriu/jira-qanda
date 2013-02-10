@@ -94,9 +94,9 @@ public class GadgetRestService {
         if(LOG.isDebugEnabled()) {
             LOG.debug("Getting questions for project:" + project + "<");
         }
-        List<Question> questions = service.getUnsolvedQuestionsForProject(project);
-        formatText(questions);
-        return questions;
+        //::TODO::List<Question> questions = service.getUnsolvedQuestionsForProject(project);
+        //formatText(questions);
+        return new ArrayList<Question>();
     }
 
     private void formatText(List<Question> questions) {
@@ -110,12 +110,12 @@ public class GadgetRestService {
 
     private void formatQuestionText(Question q) {
         try {
-            Issue issue = issueManager.getIssueObject(q.getIssueKey());
+            Issue issue = issueManager.getIssueObject(q.getIssueId());
             q.setQuestionText(rendererMgr.getRendererForType("atlassian-wiki-renderer")
                     .render(q.getQuestionText(), new IssueRenderContext(issue)));
         } catch(Exception e) {
-            LOG.warn(String.format("Error rendering question %d for issue %s",
-                                   q.getId(), q.getIssueKey()));
+            LOG.warn(String.format("Error rendering question %d for issue %d",
+                                   q.getId(), q.getIssueId()));
         }
     }
 

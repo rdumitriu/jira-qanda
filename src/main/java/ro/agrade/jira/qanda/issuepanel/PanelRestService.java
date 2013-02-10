@@ -72,6 +72,7 @@ public class PanelRestService {
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
     @Produces({MediaType.APPLICATION_JSON})
     public boolean addAnswer(@FormParam("questionId") String questionId,
+                             @FormParam("issueKey") String issueKey,
                              @FormParam("answer") String answer) {
         if(LOG.isDebugEnabled()) {
             LOG.debug("Adding answer:" + questionId + " >" + answer + "<");
@@ -80,10 +81,10 @@ public class PanelRestService {
             return false;
         }
         try {
-            service.addAnswer(Long.parseLong(questionId), answer);
+            service.addAnswer(Long.parseLong(questionId), issueKey, answer);
             return true;
         } catch (NumberFormatException e) {
-            LOG.error("Question id >" + questionId + "< doesn't seem exactly an id");
+            LOG.error("Question id >" + questionId + "< doesn't seem to be an id");
         }
         return false;
     }

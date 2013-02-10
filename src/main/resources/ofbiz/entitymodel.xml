@@ -15,8 +15,7 @@
         <description>The Questions</description>
 
         <field name="q_id" type="numeric"/>
-        <field name="q_pkey" type="long-varchar"/>
-        <field name="q_ikey" type="long-varchar"/>
+        <field name="q_issueid" type="numeric"/>
         <field name="q_creationts" type="numeric"/>
         <field name="q_user" type="long-varchar"/>
         <field name="q_status" type="long-varchar"/>
@@ -26,16 +25,11 @@
 		<prim-key field="q_id"/>
 
         <index name="QANDAQ_IDX_1" unique="false">
-            <index-field name="q_ikey"/>
+            <index-field name="q_issueid"/>
             <index-field name="q_status"/>
         </index>
 
-		<index name="QANDAQ_IDX_2" unique="false">
-            <index-field name="q_pkey"/>
-            <index-field name="q_status"/>
-        </index>
-
-        <index name="QANDAQ_IDX_3" unique="false">
+        <index name="QANDAQ_IDX_2" unique="false">
             <index-field name="q_user"/>
         </index>
     </entity>
@@ -47,6 +41,7 @@
 
         <field name="a_id" type="numeric"/>
         <field name="q_id" type="numeric"/>
+        <field name="a_issueid" type="numeric"/>
         <field name="a_creationts" type="numeric"/>
         <field name="a_user" type="long-varchar"/>
         <field name="a_status" type="long-varchar"/>

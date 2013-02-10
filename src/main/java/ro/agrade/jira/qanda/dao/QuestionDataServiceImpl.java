@@ -25,6 +25,10 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
     private static final Log LOG = LogFactory.getLog(QuestionDataServiceImpl.class);
     private final GenericDelegator delegator;
 
+    /**
+     * Constructor
+     * @param authContext the authentication context we should inject into this
+     */
     public QuestionDataServiceImpl(JiraAuthenticationContext authContext) {
         super(authContext);
         this.delegator = GenericDelegator.getGenericDelegator("default");
@@ -32,59 +36,48 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
 
     /**
      * Gets all undeleted questions
-     * @param key the issue key
+     * @param issueId the issue id
      * @return the list of questions
      */
     @Override
-    public List<Question> getQuestionsForIssue(String key) {
+    public List<Question> getQuestionsForIssue(long issueId) {
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put(ISSUEKEY_FIELD, key);
+            map.put(ISSUEID_FIELD, issueId);
             map.put(DELETED_FIELD, "N");
             List<GenericValue> list = delegator.findByAnd(ENTITY, map);
             List<Question> ret = fromGenericValue(list);
-            Collections.sort(ret, new Comparator<Question>() {
-                @Override
-                public int compare(Question o1, Question o2) {
-                    return (int)(o2.getTimeStamp() - o1.getTimeStamp());
-                }
-            });
             return ret;
         } catch(GenericEntityException e) {
-            String msg = String.format("Could not load issue (%s) questions ?!?", key);
+            String msg = String.format("Could not load issue (%d) questions ?!?", issueId);
             LOG.error(msg);
             throw new OfbizDataException(msg, e);
         }
     }
 
-    /**
-     * Gets all unresolved questions
-     *
-     * @param project the project
-     * @return the questions for the project which are not resolved, if any
-     */
-    @Override
-    public List<Question> getUnresolvedQuestionsForProject(String project) {
-        try {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put(PRJKEY_FIELD, project);
-            map.put(STATUS_FIELD, translateStatusToCode(QuestionStatus.OPEN));
-            map.put(DELETED_FIELD, "N");
-            List<GenericValue> list = delegator.findByAnd(ENTITY, map);
-            List<Question> ret = fromGenericValue(list);
-            Collections.sort(ret, new Comparator<Question>() {
-                @Override
-                public int compare(Question o1, Question o2) {
-                    return (int)(o1.getTimeStamp() - o2.getTimeStamp());
-                }
-            });
-            return ret;
-        } catch(GenericEntityException e) {
-            String msg = String.format("Could not load project (%s) questions ?!?", project);
-            LOG.error(msg);
-            throw new OfbizDataException(msg, e);
-        }
-    }
+//    //::TODO:: panel
+//    /**
+//     * Gets all unresolved questions
+//     *
+//     * @param project the project
+//     * @return the questions for the project which are not resolved, if any
+//     */
+//    @Override
+//    public List<Question> getUnresolvedQuestionsForProject(String project) {
+//        //::TODO:: we must fix this
+//        try {
+//            Map<String, Object> map = new HashMap<String, Object>();
+//            map.put(STATUS_FIELD, translateStatusToCode(QuestionStatus.OPEN));
+//            map.put(DELETED_FIELD, "N");
+//            List<GenericValue> list = delegator.findByAnd(ENTITY, map);
+//            List<Question> ret = fromGenericValue(list);
+//            return ret;
+//        } catch(GenericEntityException e) {
+//            String msg = String.format("Could not load project (%s) questions ?!?", project);
+//            LOG.error(msg);
+//            throw new OfbizDataException(msg, e);
+//        }
+//    }
 
     /**
      * Gets a specific question by id
@@ -111,12 +104,12 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
     }
 
     @Override
-    public void addQuestion(String issueKey, String question) {
+    public void addQuestion(long issueId, String question) {
         try {
-            Question q = new Question(delegator.getNextSeqId(ENTITY), issueKey, question, getActingUser());
+            Question q = new Question(delegator.getNextSeqId(ENTITY), issueId, question, getCurrentUser());
             delegator.create(toGenericValue(q));
         } catch(GenericEntityException e) {
-            String msg = String.format("Could not create question  on issue %s ?!?", issueKey);
+            String msg = String.format("Could not create question  on issue %d ?!?", issueId);
             LOG.error(msg);
             throw new OfbizDataException(msg, e);
         }
@@ -158,8 +151,7 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(ID_FIELD, q.getId());
         map.put(TEXT_FIELD, q.getQuestionText());
-        map.put(ISSUEKEY_FIELD, q.getIssueKey());
-        map.put(PRJKEY_FIELD, extractProjectFromKey(q.getIssueKey()));
+        map.put(ISSUEID_FIELD, q.getIssueId());
         map.put(TS_FIELD, q.getTimeStamp());
         map.put(USER_FIELD, q.getUser());
         map.put(STATUS_FIELD, translateStatusToCode(q.getStatus()));
@@ -167,18 +159,18 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
         return delegator.makeValue(ENTITY, map);
     }
 
-    private String extractProjectFromKey(String issueKey) {
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < issueKey.length(); i++) {
-            char c = issueKey.charAt(i);
-            if(c != '-') {
-                sb.append(c);
-            } else {
-                return sb.toString();
-            }
-        }
-        throw new OfbizDataException("Invalid issue key: " + issueKey);
-    }
+//    private String extractProjectFromKey(String issueKey) {
+//        StringBuilder sb = new StringBuilder();
+//        for(int i = 0; i < issueKey.length(); i++) {
+//            char c = issueKey.charAt(i);
+//            if(c != '-') {
+//                sb.append(c);
+//            } else {
+//                return sb.toString();
+//            }
+//        }
+//        throw new OfbizDataException("Invalid issue key: " + issueKey);
+//    }
 
     private Question fromGenericValue(GenericValue genval) {
         if(genval == null) {
@@ -186,12 +178,12 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
         }
         long id = (Long)genval.get(ID_FIELD);
         String questionText = (String)genval.get(TEXT_FIELD);
-        String issueKey = (String)genval.get(ISSUEKEY_FIELD);
+        long issueId = (Long)genval.get(ISSUEID_FIELD);
         long timeStamp = (Long)genval.get(TS_FIELD);
         String user = (String)genval.get(USER_FIELD);
         String statusCode = (String)genval.get(STATUS_FIELD);
 
-        return new Question(id, issueKey, questionText,
+        return new Question(id, issueId, questionText,
                             user, timeStamp,
                             translateStatusFromCode(statusCode), null);
     }
@@ -210,8 +202,10 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
     private QuestionStatus translateStatusFromCode(String s) {
         switch(s.charAt(0)) {
             case 'O':
+            case 'o':
                 return QuestionStatus.OPEN;
             case 'C':
+            case 'c':
                 return QuestionStatus.CLOSED;
         }
         throw new OfbizDataException("Bad mapping for status >>" + s + "<<");
@@ -230,8 +224,7 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
     private static final String ENTITY = "QANDAQ";
     private static final String ID_FIELD = "q_id";
     private static final String TEXT_FIELD = "q_text";
-    private static final String ISSUEKEY_FIELD = "q_ikey";
-    private static final String PRJKEY_FIELD = "q_pkey";
+    private static final String ISSUEID_FIELD = "q_issueid";
     private static final String TS_FIELD = "q_creationts";
     private static final String USER_FIELD = "q_user";
     private static final String STATUS_FIELD = "q_status";

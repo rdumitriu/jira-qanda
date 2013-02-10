@@ -25,25 +25,26 @@ public interface QuestionDataService {
 
     /**
      * Gets all undeleted questions
-     * @param key the issue key
+     * @param issueId the issue id
      * @return the list of questions
      */
-    public abstract List<Question> getQuestionsForIssue(String key);
+    public abstract List<Question> getQuestionsForIssue(long issueId);
 
-    /**
-     * Gets all unresolved questions
-     *
-     * @param project the project
-     * @return the questions for the project which are not resolved, if any
-     */
-    public abstract List<Question> getUnresolvedQuestionsForProject(String project);
+//  ::TODO:: PANEL
+//    /**
+//     * Gets all unresolved questions
+//     *
+//     * @param project the project
+//     * @return the questions for the project which are not resolved, if any
+//     */
+//    public abstract List<Question> getUnresolvedQuestionsForProject(String project);
 
     /**
      * Add a question
-     * @param issueKey the key
+     * @param issueId the id of the issue
      * @param question the text
      */
-    public abstract void addQuestion(String issueKey, String question);
+    public abstract void addQuestion(long issueId, String question);
 
     /**
      * Deletes a question
@@ -53,7 +54,7 @@ public interface QuestionDataService {
 
     /**
      * Sets a question flag
-     * @param id the id
+     * @param id the id of the question
      * @param sts the status
      */
     public abstract void setQuestionFlag(long id, QuestionStatus sts);

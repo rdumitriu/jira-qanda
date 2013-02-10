@@ -23,6 +23,10 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
     private static final Log LOG = LogFactory.getLog(AnswerDataServiceImpl.class);
     private final GenericDelegator delegator;
 
+    /**
+     * Constructor
+     * @param authContext the auth context to be injected
+     */
     public AnswerDataServiceImpl(JiraAuthenticationContext authContext) {
         super(authContext);
         this.delegator = GenericDelegator.getGenericDelegator("default");
@@ -50,15 +54,37 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
     }
 
     /**
+     * Gets all the answers for the issue
+     *
+     * @param issueId the issue id
+     * @return the list of answers
+     */
+    @Override
+    public List<Answer> getAnswersForIssue(long issueId) {
+        try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put(ISSUEID_FIELD, issueId);
+            map.put(DELETED_FIELD, "N");
+            List<GenericValue> list = delegator.findByAnd(ENTITY, map);
+            return fromGenericValue(list);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not load issue (%d) answers ?!?", issueId);
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    /**
      * Add an answer
      *
-     * @param qid    the question id
+     * @param qid the question id
+     * @param issueId the issue id
      * @param answer the answer text
      */
     @Override
-    public void addAnswer(long qid, String answer) {
+    public void addAnswer(long qid, long issueId, String answer) {
         try {
-            Answer q = new Answer(delegator.getNextSeqId(ENTITY), qid, answer, getActingUser());
+            Answer q = new Answer(delegator.getNextSeqId(ENTITY), qid, issueId, answer, getCurrentUser());
             delegator.create(toGenericValue(q));
         } catch(GenericEntityException e) {
             String msg = String.format("Could not create answer on question %d ?!?", qid);
@@ -116,8 +142,8 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(ID_FIELD, a.getAnswerId());
         map.put(QUESTIONID_FIELD, a.getQuestionId());
+        map.put(ISSUEID_FIELD, a.getIssueId());
         map.put(TEXT_FIELD, a.getAnswerText());
-
         map.put(TS_FIELD, a.getTimeStamp());
         map.put(USER_FIELD, a.getUser());
         map.put(STATUS_FIELD, a.isAccepted() ? "Y" : "N");
@@ -131,12 +157,13 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
         }
         long id = (Long)genval.get(ID_FIELD);
         long qid = (Long)genval.get(QUESTIONID_FIELD);
+        long issid = (Long)genval.get(ISSUEID_FIELD);
         String text = (String)genval.get(TEXT_FIELD);
         long timeStamp = (Long)genval.get(TS_FIELD);
         String user = (String)genval.get(USER_FIELD);
         String statusCode = (String)genval.get(STATUS_FIELD);
 
-        return new Answer(id, qid, text, user, timeStamp, "Y".equals(statusCode));
+        return new Answer(id, qid, issid, text, user, timeStamp, "Y".equals(statusCode));
     }
 
     private List<Answer> fromGenericValue(List<GenericValue> l) {
@@ -153,6 +180,7 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
     private static final String ENTITY = "QANDAA";
     private static final String ID_FIELD = "a_id";
     private static final String QUESTIONID_FIELD = "q_id";
+    private static final String ISSUEID_FIELD = "a_issueid";
     private static final String TS_FIELD = "a_creationts";
     private static final String USER_FIELD = "a_user";
     private static final String STATUS_FIELD = "a_status";
