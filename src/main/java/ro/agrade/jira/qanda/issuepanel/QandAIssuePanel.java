@@ -1,6 +1,7 @@
 package ro.agrade.jira.qanda.issuepanel;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
@@ -54,21 +55,50 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         webResourceManager.requireResource("ro.agrade.jira.qanda:qanda-resources");
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
+        User currentUser = authContext.getLoggedInUser();
+        boolean canOverrideActions = userCanOverrideActions(currentUser, issue);
+        UIFormatter formatter = new UIFormatter(userManager, authContext, properties, rendererMgr, issue);
+        String baseURL = properties.getString("jira.baseurl");
+
         List<IssueAction> actions = new ArrayList<IssueAction>();
         List<Question> questions = service.loadQuestionsForIssue(issue.getKey());
-        actions.add(new QandAIssueAction(descriptor, properties, issue, authContext, userManager, rendererMgr, permissionManager, null));
+        actions.add(new QandAIssueAction(descriptor, issue, currentUser, null,
+                                         false, canOverrideActions, baseURL, formatter));
         if(questions == null || questions.size() == 0){
         	return actions;
         }
-        for(Question q : questions){
-        	actions.add(new QandAIssueAction(descriptor, properties, issue, authContext, userManager, rendererMgr, permissionManager, q));
+        for(int i = 0; i < questions.size(); i++) {
+            boolean canAdd = (i == 0); //explicit
+            actions.add(new QandAIssueAction(descriptor, issue, currentUser,  questions.get(i),
+                                             canAdd, canOverrideActions, baseURL, formatter));
         }
         return actions;
     }
 
     @Override
     public boolean showPanel(Issue issue, User user) {
-        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user);
+        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user) &&
+               permissionManager.hasPermission(Permissions.BROWSE, issue.getProjectObject(), user);
+    }
+
+    private boolean userCanOverrideActions(User currentUser, Issue issue) {
+        if(permissionManager.hasPermission(Permissions.ADMINISTER, currentUser) ||
+                permissionManager.hasPermission(Permissions.PROJECT_ADMIN, issue.getProjectObject(), currentUser) ||
+                permissionManager.hasPermission(Permissions.SYSTEM_ADMIN, currentUser)) {
+            return true;
+        }
+        if(issue.getProjectObject().getLead() != null &&
+                issue.getProjectObject().getLead().getName().equals(currentUser.getName())) {
+            return true;
+        }
+        if(issue.getComponentObjects() != null) {
+            for(ProjectComponent cmpt : issue.getComponentObjects()) {
+                if(cmpt.getLead() != null && cmpt.getLead().equals(currentUser.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
