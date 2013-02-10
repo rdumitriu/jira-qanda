@@ -99,6 +99,7 @@
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.data.version}</productDataVersion>
                     <compressResources>false</compressResources>
+                    <useFastdevCli>false</useFastdevCli>
                     <!--pluginDependencies>
                         <pluginDependency>
                             <groupId>libgrp</groupId>
@@ -107,15 +108,16 @@
                     </pluginDependencies-->
                     <instructions>
                         <Bundle-Activator>ro.agrade.jira.qanda.plugin.PluginBundleActivator</Bundle-Activator>
-                        <Private-Package>com.atlassian.upm.license.storage.lib.*</Private-Package>
+                        <!-- Licensing dependencies ?! -->
+                        <!-- Private-Package>com.atlassian.upm.license.storage.lib.*</Private-Package>
                         <DynamicImport-Package>
                             com.atlassian.upm.api.license.entity,
                             com.atlassian.upm.api.license,
                             com.atlassian.upm.api.util,
                             com.atlassian.upm.license.storage.plugin;version="${upm.license.compatibility.version}"
-                        </DynamicImport-Package>
+                        </DynamicImport-Package -->
                     </instructions>
-                    <bundledArtifacts>
+                    <!-- bundledArtifacts>
                         <bundledArtifact>
                             <groupId>com.atlassian.upm</groupId>
                             <artifactId>atlassian-universal-plugin-manager-plugin</artifactId>
@@ -126,7 +128,7 @@
                             <artifactId>plugin-license-storage-plugin</artifactId>
                             <version>${upm.license.compatibility.version}</version>
                         </bundledArtifact>
-                    </bundledArtifacts>
+                    </bundledArtifacts -->
                 </configuration>
                 <executions>
                     <execution>
@@ -138,7 +140,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -154,14 +156,14 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin -->
         </plugins>
     </build>
 
     <properties>
         <jira.version>5.0.1</jira.version>
         <jira.data.version>5.0.1</jira.data.version>
-        <amps.version>4.1.2</amps.version>
+        <amps.version>4.1.4</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
