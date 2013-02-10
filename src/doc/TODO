@@ -1,7 +1,7 @@
 
 MUST DO:
 Technical stuff:
-a) Answers should be taken via a REST call, not directly in the VT.
+a) Answers should be taken via a REST call, not directly in the VT (velocity template).
 b) Clear the beans, separate clearly the UI from base to limit the network transported data.
 c) UI changes:
     c.1) Gadget styles + add Issue summary
