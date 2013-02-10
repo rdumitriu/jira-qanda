@@ -4,11 +4,9 @@ FUNCTIONALITIES
 1/ Forget for now about recipients. These are public questions.
 Maybe future versions, since it can be easily expanded, plus it reduces the
 development time. Actually, we want something like automated recipients finds.
+(via @mentions ?)
 
 2/ No modify besides delete. Delete can only be performed by the owner if no
 restrictions are applied (question is answered, answer is approved). This is to
-avoid discussions (like: "I didn't asked THAT ...")
-
-3/ Add to description functionality (once approved).
-
-4/ Add to comments functionality (once approved)
+avoid discussions (like: "I didn't asked THAT ..."). This needs to be relaxed,
+though.
