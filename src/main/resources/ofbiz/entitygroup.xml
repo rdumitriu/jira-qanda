@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE entitygroup PUBLIC "-//OFBiz//DTD Entity Group//EN" "http://www.ofbiz.org/dtds/entitygroup.dtd">
+
+<entitygroup>
+
+	<!-- Configuration Plugin entities -->
+	<entity-group group="default" entity="QANDAQ" />
+	<entity-group group="default" entity="QANDAA" />
+	
+</entitygroup>

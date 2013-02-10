@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="Unresolved Questions"
+                 directory_title="Unresolved questions"
+                 description="Shows unresolved questions on a project"
+                 author="Radu Dumitriu"
+                 author_affiliation="AGRADE"
+                 author_location="Bucharest, Romania" height="100"
+                 >
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                JIRA
+                Wallboard
+                Collaboration
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="views" />
+        <Require feature="setprefs" />
+        <Require feature="dynamic-height"/>
+        <Require feature="oauthpopup" />
+        #oauth
+        #supportedLocales("gadget.common")
+    </ModulePrefs>
+    <UserPref name="isConfigured" datatype="hidden" default_value="true" />
+    <UserPref name="project" datatype="hidden" />
+    <Content type="html" view="canvas,default">
+        <![CDATA[
+
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.auiplugin:aui-experimental-lozenge")
+        #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+        #requireResource("ro.agrade.jira.qanda:qanda-gadget-resources")
+        #includeResources()
+
+        <script type="text/javascript">
+            AJS.Gadget({
+			    baseUrl: "__ATLASSIAN_BASE_URL__",
+			    useOauth: "/rest/gadget/1.0/currentUser",
+			    config: {
+                    descriptor: function (args) {
+                        return QANDAGADGET.descriptor(this, args, "__ATLASSIAN_BASE_URL__");
+                    }
+                },
+			    view: {
+			        enableReload: true,
+			        onResizeAdjustHeight: true,
+			        template: function (args) {
+                        args = args || {};
+			    		return QANDAGADGET.template(this, args, "__ATLASSIAN_BASE_URL__");
+			        }
+			    }
+			});
+        </script>
+        ]]>
+    </Content>
+</Module>

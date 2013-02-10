@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE entitymodel PUBLIC "-//OFBiz//DTD Entity Model//EN" "http://www.ofbiz.org/dtds/entitymodel.dtd">
+
+<entitymodel>
+    <title>Entity Model for QandA plugin</title>
+    <description>Contains the entities for Questions and Answers</description>
+    <copyright>AGRADE</copyright>
+    <author>Radu Dumitriu</author>
+    <version>1.0</version>
+
+	<entity entity-name="QANDAQ"
+            table-name="QANDAQ"
+            package-name="ro.agrade.jira.quanda">
+        <description>The Questions</description>
+
+        <field name="q_id" type="numeric"/>
+        <field name="q_pkey" type="long-varchar"/>
+        <field name="q_ikey" type="long-varchar"/>
+        <field name="q_creationts" type="numeric"/>
+        <field name="q_user" type="long-varchar"/>
+        <field name="q_status" type="long-varchar"/>
+        <field name="q_text" type="extremely-long"/>
+        <field name="q_deleted" type="long-varchar"/>
+        
+		<prim-key field="q_id"/>
+
+        <index name="QANDAQ_IDX_1" unique="false">
+            <index-field name="q_ikey"/>
+            <index-field name="q_status"/>
+        </index>
+
+		<index name="QANDAQ_IDX_2" unique="false">
+            <index-field name="q_pkey"/>
+            <index-field name="q_status"/>
+        </index>
+
+        <index name="QANDAQ_IDX_3" unique="false">
+            <index-field name="q_user"/>
+        </index>
+    </entity>
+
+    <entity entity-name="QANDAA"
+            table-name="QANDAA"
+            package-name="ro.agrade.jira.quanda">
+        <description>The Answers</description>
+
+        <field name="a_id" type="numeric"/>
+        <field name="q_id" type="numeric"/>
+        <field name="a_creationts" type="numeric"/>
+        <field name="a_user" type="long-varchar"/>
+        <field name="a_status" type="long-varchar"/>
+        <field name="a_text" type="extremely-long"/>
+        <field name="a_deleted" type="long-varchar"/>
+
+        <prim-key field="a_id"/>
+
+        <relation type="one" title="Answers-to-Questions" rel-entity-name="QANDAQ" fk-name="QANDAA_Q_FK">
+            <key-map field-name="q_id" rel-field-name="q_id"/>
+        </relation>
+    </entity>
+	
+</entitymodel>
