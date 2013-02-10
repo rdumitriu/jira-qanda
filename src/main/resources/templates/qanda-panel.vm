@@ -1,99 +1,82 @@
+#if(!$question)
 
-<table cellspacing='4' cellpadding='2' border='0' width='100%' class='qandatable'>
-#if($permitAdd == true)
-<tr>
-    <td colspan='2'>
-        <h5>$i18n.getText("qanda.panel.title") - $issue.key</h5>
-    </td>
-    <td>
-        <div id='qanda_addbutton' class="aui-toolbar" style="padding-top: 0px;">
-            <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
-                <ul class="toolbar-group">
-                    <li class="toolbar-item"><a id="quanda_addquestion" baseUrl="$baseJIRAURL" issueKey="$issue.key" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.addquestionlink")]</span></a></li>
-                </ul>
-            </div>
+    <h5>$i18n.getText("qanda.panel.title") - $issue.key</h5>
+    
+	#if($permitAdd == true)
+    <div id='qanda_addbutton' class="aui-toolbar" style="padding-top: 0px;">
+        <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
+            <ul class="toolbar-group">
+                <li class="toolbar-item"><a id="quanda_addquestion" baseUrl="$baseJIRAURL" issueKey="$issue.key" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.addquestionlink")]</span></a></li>
+            </ul>
         </div>
-    </td>
-</tr>
-<tr>
-    <td colspan='3'>
-        <div id="quanda-error" class='hidden'></div>
-    </td>
-</tr>
-#end
-#if($!questions.size() > 0)
-    <tr><td colspan='3'><hr size='1'></td></tr>
-    #foreach ($q in $questions)
-        <tr>
-            <td>
-                #if($q.answered == false)
-                    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-default">$i18n.getText("qanda.status.noanswer")</span>
-                #else
-                    #if($q.closed == false)
-                        <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-complete">$i18n.getText("qanda.status.answered")</span>
-                    #else
-                        <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-success">$i18n.getText("qanda.status.clarified")</span>
-                    #end
+    </div>
+    <br/>
+    <hr size='1'>
+	#end
+	
+    <div id="quanda-error" class='hidden'></div>
+#else
+
+	<!-- ============== QUESTION ============== -->
+	<!-- ====================================== -->
+	
+    #if($question.answered == false)
+        <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-default">$i18n.getText("qanda.status.noanswer")</span>
+    #else
+        #if($question.closed == false)
+            <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-complete">$i18n.getText("qanda.status.answered")</span>
+        #else
+            <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-success">$i18n.getText("qanda.status.clarified")</span>
+        #end
+    #end
+    <div class='qandauser'>$uiFormatter.formatUser($question.user) $i18n.getText("qanda.panel.asked") </div>
+    <div class='qandadateq'>$uiFormatter.formatTimeStamp($question.timeStamp)</div>
+    
+    <div class="user-content-block qandaq">$uiFormatter.formatText($question.questionText)</div>
+    
+    <div class="aui-toolbar" style="padding-top: 0px;">
+        <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
+            <ul class="toolbar-group">
+                <li class="toolbar-item"><a id="quanda_addanswer_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.addanswerlink")]</span></a></li>
+                #if(($currentUser.name == $question.user || $overrideActions) && $question.answers.size() == 0)
+                <li class="toolbar-item"><a id="quanda_delquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.deletequestionlink")]</span></a></li>
                 #end
-                <div class='qandauser'>$uiFormatter.formatUser($q.user) $i18n.getText("qanda.panel.asked") </div>
-                <div class='qandadateq'>$uiFormatter.formatTimeStamp($q.timeStamp)</div>
-            </td>
-            <td>
-                <div class="user-content-block qandaq">$uiFormatter.formatText($q.questionText)</div>
-            </td>
-            <td>
+            </ul>
+        </div>
+    </div>
+    
+    
+    
+    <!-- ============== ANSWERS =============== -->
+	<!-- ====================================== -->
+	            
+    #if($!q.answers.size() == 0)
+        <div class="user-content-block qandaunas">$i18n.getText("qanda.panel.beagoodguy")</div>
+    #else
+        #foreach ($a in $question.answers)
+                <div class='qandauser qandaa'>$uiFormatter.formatUser($a.user) $i18n.getText("qanda.panel.answered")</div>
+                <div class='qandadatea'>$uiFormatter.formatTimeStamp($a.timeStamp)</div>
+                
+                <div class="user-content-block qandaa">$uiFormatter.formatText($a.answerText)</div>
+                
                 <div class="aui-toolbar" style="padding-top: 0px;">
                     <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
                         <ul class="toolbar-group">
-                            <li class="toolbar-item"><a id="quanda_addanswer_$q.id" questionId='$q.id' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.addanswerlink")]</span></a></li>
-                            #if(($currentUser.name == $q.user || $overrideActions) && $q.answers.size() == 0)
-                            <li class="toolbar-item"><a id="quanda_delquestion_$q.id" questionId='$q.id' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.deletequestionlink")]</span></a></li>
+                        #if($currentUser.name == $question.user || $overrideActions)
+                            #if($a.accepted == false)
+                                <li class="toolbar-item"><a id="quanda_approvelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.approvelink")]</span></a></li>
+                            #else
+                                <li class="toolbar-item"><a id="quanda_disapprovelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.clearapprovallink")]</span></a></li>
                             #end
+                        #end
+                        #if(($currentUser.name == $a.user || $overrideActions) && $a.accepted == false)
+                            <li class="toolbar-item"><a id="quanda_deleteanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.deleteanswerlink")]</span></a></li>
+                        #end
                         </ul>
                     </div>
                 </div>
-            </td>
-        </tr>
-        #if($!q.answers.size() == 0)
-            <tr>
-                <td>&nbsp;</td>
-                <td><div class="user-content-block qandaunas">$i18n.getText("qanda.panel.beagoodguy")</div></td>
-                <td>&nbsp;</td>
-            </tr>
-        #else
-            #foreach ($a in $q.answers)
-            <tr>
-                <td>
-                    <div class='qandauser qandaa'>$uiFormatter.formatUser($a.user) $i18n.getText("qanda.panel.answered")</div>
-                    <div class='qandadatea'>$uiFormatter.formatTimeStamp($a.timeStamp)</div>
-                </td>
-                <td>
-                    <div class="user-content-block qandaa">$uiFormatter.formatText($a.answerText)</div>
-                </td>
-                <td>
-                    <div class="aui-toolbar" style="padding-top: 0px;">
-                        <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
-                            <ul class="toolbar-group">
-                            #if($currentUser.name == $q.user || $overrideActions)
-                                #if($a.accepted == false)
-                                    <li class="toolbar-item"><a id="quanda_approvelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.approvelink")]</span></a></li>
-                                #else
-                                    <li class="toolbar-item"><a id="quanda_disapprovelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.clearapprovallink")]</span></a></li>
-                                #end
-                            #end
-                            #if(($currentUser.name == $a.user || $overrideActions) && $a.accepted == false)
-                                <li class="toolbar-item"><a id="quanda_deleteanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>[$i18n.getText("qanda.panel.deleteanswerlink")]</span></a></li>
-                            #end
-                            </ul>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            #end
         #end
-        <tr><td colspan='3'><hr size='1'></td></tr>
     #end
-#else
-    <tr><td colspan='3'><div class="user-content-block qandaunas">$i18n.getText("qanda.panel.noquestions")</div></td></tr>
+    <hr size='1'>    
 #end
-</table>
+

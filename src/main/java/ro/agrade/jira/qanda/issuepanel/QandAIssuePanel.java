@@ -12,6 +12,7 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import ro.agrade.jira.qanda.QandAService;
+import ro.agrade.jira.qanda.Question;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,14 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
-        actions.add(new QandAIssueAction(descriptor, properties, issue, authContext, userManager, service, rendererMgr, permissionManager));
+        List<Question> questions = service.loadQuestionsForIssue(issue.getKey());
+        actions.add(new QandAIssueAction(descriptor, properties, issue, authContext, userManager, rendererMgr, permissionManager, null));
+        if(questions == null || questions.size() == 0){
+        	return actions;
+        }
+        for(Question q : questions){
+        	actions.add(new QandAIssueAction(descriptor, properties, issue, authContext, userManager, rendererMgr, permissionManager, q));
+        }
         return actions;
     }
 

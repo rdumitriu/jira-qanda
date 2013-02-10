@@ -14,7 +14,7 @@ import com.atlassian.jira.plugin.issuetabpanel.AbstractIssueAction;
 import com.atlassian.jira.plugin.issuetabpanel.IssueTabPanelModuleDescriptor;
 import com.atlassian.jira.security.*;
 import com.atlassian.jira.user.util.UserManager;
-import ro.agrade.jira.qanda.QandAService;
+import ro.agrade.jira.qanda.Question;
 
 
 /**
@@ -29,26 +29,26 @@ public class QandAIssueAction extends AbstractIssueAction {
     private final ApplicationProperties properties;
     private final UserManager userManager;
     private final Issue issue;
-    private final QandAService service;
     private final RendererManager rendererMgr;
     private final PermissionManager permissionManager;
+    private final Question question;
 
     public QandAIssueAction(final IssueTabPanelModuleDescriptor descriptor,
                             final ApplicationProperties properties,
                             final Issue issue,
                             final JiraAuthenticationContext authContext,
                             final UserManager userManager,
-                            final QandAService service,
                             final RendererManager rendererMgr,
-                            final PermissionManager permissionManager) {
+                            final PermissionManager permissionManager,
+                            final Question question) {
         super(descriptor);
         this.properties = properties;
         this.authContext = authContext;
         this.userManager = userManager;
         this.issue = issue;
-        this.service = service;
         this.rendererMgr = rendererMgr;
         this.permissionManager = permissionManager;
+        this.question = question;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class QandAIssueAction extends AbstractIssueAction {
         map.put("baseJIRAURL", properties.getString("jira.baseurl"));
         map.put("issue", issue);
         map.put("uiFormatter", new UIFormatter(userManager, authContext, properties, rendererMgr, issue));
-        map.put("questions", service.loadQuestionsForIssue(issue.getKey()));
+        map.put("question", question);
     }
 
     private boolean userCanOverrideActions(User currentUser, Issue issue) {
