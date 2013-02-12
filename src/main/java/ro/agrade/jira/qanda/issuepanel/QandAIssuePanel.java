@@ -62,15 +62,18 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         List<Question> questions = service.loadQuestionsForIssue(issue.getKey());
+        
+        // add first action with null Q to add title and add Q button
         actions.add(new QandAIssueAction(descriptor, issue, currentUser, null,
-                                         false, canOverrideActions, baseURL, formatter));
+                                         canOverrideActions, baseURL, formatter));
+        
         if(questions == null || questions.size() == 0){
         	return actions;
         }
-        for(int i = 0; i < questions.size(); i++) {
-            boolean canAdd = (i == 0); //explicit
-            actions.add(new QandAIssueAction(descriptor, issue, currentUser,  questions.get(i),
-                                             canAdd, canOverrideActions, baseURL, formatter));
+        // for each Q add a new action
+        for(Question q : questions) {
+            actions.add(new QandAIssueAction(descriptor, issue, currentUser,  q,
+                                             canOverrideActions, baseURL, formatter));
         }
         return actions;
     }

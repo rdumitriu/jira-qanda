@@ -16,15 +16,62 @@
 .qandadatea {
     font-color: 060606;
     font-size: 80%;
-    margin-left: 35px;
     display: inline-block;
 }
 
 .qandaunas {
     font-color: 060606;
-    margin-left: 35px;
+    /*margin-left: 35px;*/
 }
 
 .qandaa {
-    margin-left: 35px;
+    /*margin-left: 35px;*/
+}
+
+.qandauser .user-hover {
+	font-weight: bold;
+}
+
+.qanda-question-thread {
+	background-color: white;
+}
+
+.qanda-question-thread:hover {
+	/*background-color: #f0f0f0;*/
+}
+
+.qanda-question-panel .twixi-trigger {
+	position: absolute;
+	margin-left: -20px;
+}
+
+.qanda-answers-panel {
+	margin-left: 35px;
+	border-left : 1px solid #ddd;
+}
+
+.qanda-panel-item {
+    padding : 10px;
+    border-bottom : 1px solid #ddd;
+    background-color: white;
+}
+
+.qanda-question-panel {
+	padding-left: 30px;
+}
+
+.qanda-panel-item:hover {
+    background-color: #f0f0f0;
+}
+
+.qanda-panel-item .actions-toolbar {
+    float : right;
+    display : none;
+}
+.qanda-panel-item:hover .actions-toolbar {
+    display : block;
+}
+
+.qanda-panel-item .aui-lozenge{
+    float: right;
 }

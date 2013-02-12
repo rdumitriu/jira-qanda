@@ -22,7 +22,6 @@ import ro.agrade.jira.qanda.Question;
 public class QandAIssueAction extends AbstractIssueAction {
     private final Issue issue;
     private final Question question;
-    private final boolean canAddQuestion;
     private final boolean canOverrideActions;
     private final User currentUser;
     private final String jiraBaseUrl;
@@ -32,7 +31,6 @@ public class QandAIssueAction extends AbstractIssueAction {
                             final Issue issue,
                             final User currentUser,
                             final Question question,
-                            final boolean canAddQuestion,
                             final boolean canOverrideActions,
                             final String jiraBaseUrl,
                             final UIFormatter uiFormatter) {
@@ -40,7 +38,6 @@ public class QandAIssueAction extends AbstractIssueAction {
         this.issue = issue;
         this.question = question;
         this.currentUser = currentUser;
-        this.canAddQuestion = canAddQuestion;
         this.canOverrideActions = canOverrideActions;
         this.jiraBaseUrl = jiraBaseUrl;
         this.uiFormatter = uiFormatter;
@@ -54,7 +51,6 @@ public class QandAIssueAction extends AbstractIssueAction {
     @Override
     @SuppressWarnings("unchecked")
     protected void populateVelocityParams(Map map) {
-        map.put("permitAdd", canAddQuestion);
         map.put("overrideActions", canOverrideActions);
         map.put("currentUser", currentUser);
         map.put("baseJIRAURL", jiraBaseUrl);

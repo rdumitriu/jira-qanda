@@ -26,7 +26,7 @@ var QANDA = (function () {
         dialog.addPanel("Panel1", createAskPanelContent(), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
-        dialog.addSubmit("Ask your question ...", function() {
+        dialog.addButton("Ask your question ...", function() {
             var txt = AJS.$('#qandaquestiontext').val();
             if(txt.length > 0) {
                 console.log("saving question on " + issueKey + " base: " + base);
@@ -34,7 +34,7 @@ var QANDA = (function () {
                 dialog.hide();
                 dialog.remove();
             }
-        });
+        }, "aui-button");
 
         dialog.addCancel("Forget it", function() {
             dialog.hide();
@@ -99,7 +99,7 @@ var QANDA = (function () {
         dialog.addPanel("Panel1", createRespondPanelContent(), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
-        dialog.addSubmit("Respond ...", function() {
+        dialog.addButton("Respond ...", function() {
             var txt = AJS.$('#qandaanswertext').val();
             if(txt.length > 0) {
                 console.log("saving answer on question " + qid + " base: " + base);
@@ -107,7 +107,7 @@ var QANDA = (function () {
                 dialog.hide();
                 dialog.remove();
             }
-        });
+        }, "aui-button");
 
         dialog.addCancel("Forget it", function() {
             dialog.hide();
@@ -205,6 +205,26 @@ var QANDA = (function () {
             }
         });
     }
+    
+    function toggleAnswersBlock(trigger){
+    	trigger = AJS.$(trigger);
+    	var thread = trigger.closest(".qanda-question-thread");
+    	if(trigger.hasClass("expanded")){
+    		trigger.removeClass("expanded")
+    			   .addClass("collapsed")
+    			   .find(".icon")
+    			   .removeClass("twixi-opened")
+    			   .addClass("twixi-closed");
+    		thread.find(".qanda-answers-panel").hide();
+    	} else {
+    		trigger.removeClass("collapsed")
+    			   .addClass("expanded")
+    			   .find(".icon")
+    			   .removeClass("twixi-closed")
+    			   .addClass("twixi-opened");
+    		thread.find(".qanda-answers-panel").show();    		
+    	}
+    }
 
     return {
         askQuestion: askQuestion,
@@ -212,7 +232,9 @@ var QANDA = (function () {
         respondToQuestion: respondToQuestion,
         approveAnswer: approveAnswer,
         clearApprovalAnswer: clearApprovalAnswer,
-        deleteAnswer : deleteAnswer
+        deleteAnswer : deleteAnswer,
+        
+        toggleAnswersBlock : toggleAnswersBlock
     }
 })();
 
@@ -241,5 +263,9 @@ AJS.$(document).ready(function() {
 
     AJS.$('a[id^="quanda_deleteanswer_"]').bind("click", function(e) {
         QANDA.deleteAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+    });
+    
+    AJS.$('.qanda-question-panel .twixi-trigger').live("click", function(){
+    	QANDA.toggleAnswersBlock(AJS.$(this));
     });
 });

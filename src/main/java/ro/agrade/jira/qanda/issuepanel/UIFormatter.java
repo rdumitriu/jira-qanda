@@ -7,6 +7,9 @@ import java.text.*;
 import java.util.*;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.avatar.AvatarService;
+import com.atlassian.jira.avatar.Avatar.Size;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
@@ -53,13 +56,20 @@ public class UIFormatter {
 
     public String formatUser(String user) {
         User userObj = null;
+        String avatarUrl = null;
         try {
             userObj = userManager.getUserObject(user);
+            avatarUrl = ComponentAccessor.getAvatarService().getAvatarUrlNoPermCheck(user, Size.SMALL).toString();
         } catch(Throwable t) { /* we do not care */ }
         if(null == userObj) {
             return user; // unknown, deleted
         }
-        return String.format("<a class='qandaemails' href=\"%s/secure/ViewProfile.jspa?name=%s\">%s</a>",
+        return String.format("<a class='qandaemails user-hover %s' %s rel='%s' href=\"%s/secure/ViewProfile.jspa?name=%s\">%s</a>",
+        					 avatarUrl != null ? "user-avatar" : "",
+        					 avatarUrl != null 
+        					 	? String.format("style=\"background-image: url(%s);\"", avatarUrl)
+        					 	: "",
+        					 userObj.getName(),
                              baseURL,
                              userObj.getName(),
                              userObj.getDisplayName());
