@@ -25,6 +25,7 @@
     </ModulePrefs>
     <UserPref name="isConfigured" datatype="hidden" default_value="true" />
     <UserPref name="project" datatype="hidden" />
+    <UserPref name="issinterval" datatype="hidden" />
     <Content type="html" view="canvas,default">
         <![CDATA[
 

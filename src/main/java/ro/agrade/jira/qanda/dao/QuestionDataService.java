@@ -30,14 +30,13 @@ public interface QuestionDataService {
      */
     public abstract List<Question> getQuestionsForIssue(long issueId);
 
-//  ::TODO:: PANEL
-//    /**
-//     * Gets all unresolved questions
-//     *
-//     * @param project the project
-//     * @return the questions for the project which are not resolved, if any
-//     */
-//    public abstract List<Question> getUnresolvedQuestionsForProject(String project);
+    /**
+     * Gets all unresolved questions
+     *
+     * @param issueIds the project
+     * @return the questions for the project which are not resolved, if any
+     */
+    public abstract List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds);
 
     /**
      * Add a question
@@ -58,4 +57,6 @@ public interface QuestionDataService {
      * @param sts the status
      */
     public abstract void setQuestionFlag(long id, QuestionStatus sts);
+
+
 }

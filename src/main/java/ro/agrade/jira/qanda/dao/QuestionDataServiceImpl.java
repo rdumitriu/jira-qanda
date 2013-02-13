@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 public class QuestionDataServiceImpl extends BaseDaoService implements QuestionDataService {
     private static final Log LOG = LogFactory.getLog(QuestionDataServiceImpl.class);
     private final GenericDelegator delegator;
+    private static final int INPAGE = 950;
 
     /**
      * Constructor
@@ -46,8 +47,7 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
             map.put(ISSUEID_FIELD, issueId);
             map.put(DELETED_FIELD, "N");
             List<GenericValue> list = delegator.findByAnd(ENTITY, map);
-            List<Question> ret = fromGenericValue(list);
-            return ret;
+            return fromGenericValue(list);
         } catch(GenericEntityException e) {
             String msg = String.format("Could not load issue (%d) questions ?!?", issueId);
             LOG.error(msg);
@@ -55,29 +55,41 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
         }
     }
 
-//    //::TODO:: panel
-//    /**
-//     * Gets all unresolved questions
-//     *
-//     * @param project the project
-//     * @return the questions for the project which are not resolved, if any
-//     */
-//    @Override
-//    public List<Question> getUnresolvedQuestionsForProject(String project) {
-//        //::TODO:: we must fix this
-//        try {
-//            Map<String, Object> map = new HashMap<String, Object>();
-//            map.put(STATUS_FIELD, translateStatusToCode(QuestionStatus.OPEN));
-//            map.put(DELETED_FIELD, "N");
-//            List<GenericValue> list = delegator.findByAnd(ENTITY, map);
-//            List<Question> ret = fromGenericValue(list);
-//            return ret;
-//        } catch(GenericEntityException e) {
-//            String msg = String.format("Could not load project (%s) questions ?!?", project);
-//            LOG.error(msg);
-//            throw new OfbizDataException(msg, e);
-//        }
-//    }
+    /**
+     * Gets all unresolved questions
+     *
+     * @param issueIds the project
+     * @return the questions for the project which are not resolved, if any
+     */
+    @Override
+    public List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds) {
+        try {
+            List<Question> results = new ArrayList<Question>();
+            int i = 0;
+            while( i < issueIds.size() ) {
+                //copy between i and i + page
+                List<Long> subqids = new ArrayList<Long>();
+                for(int ndx = i; ndx < i + INPAGE && ndx < issueIds.size(); ndx++) {
+                    subqids.add(issueIds.get(ndx));
+                }
+                i += INPAGE;
+                if(subqids.size() > 0) {
+                    List<EntityCondition> conds = new ArrayList<EntityCondition>();
+                    conds.add(new EntityExpr(STATUS_FIELD, EntityOperator.EQUALS, translateStatusToCode(QuestionStatus.OPEN)));
+                    conds.add(new EntityExpr(DELETED_FIELD, EntityOperator.EQUALS, "N"));
+                    conds.add(new EntityExpr(ISSUEID_FIELD, EntityOperator.IN, subqids));
+
+                    List<GenericValue> list = delegator.findByAnd(ENTITY, conds);
+                    results.addAll(fromGenericValue(list));
+                }
+            }
+            return results;
+        } catch(GenericEntityException e) {
+            String msg = "Could not load project questions ?!?";
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
 
     /**
      * Gets a specific question by id
@@ -158,19 +170,6 @@ public class QuestionDataServiceImpl extends BaseDaoService implements QuestionD
         map.put(DELETED_FIELD, "N");
         return delegator.makeValue(ENTITY, map);
     }
-
-//    private String extractProjectFromKey(String issueKey) {
-//        StringBuilder sb = new StringBuilder();
-//        for(int i = 0; i < issueKey.length(); i++) {
-//            char c = issueKey.charAt(i);
-//            if(c != '-') {
-//                sb.append(c);
-//            } else {
-//                return sb.toString();
-//            }
-//        }
-//        throw new OfbizDataException("Invalid issue key: " + issueKey);
-//    }
 
     private Question fromGenericValue(GenericValue genval) {
         if(genval == null) {

@@ -29,6 +29,14 @@ public interface AnswerDataService {
     public abstract List<Answer> getAnswersForIssue(long issueId);
 
     /**
+     * Gets all the answers that are designated for a list of issues
+     *
+     * @param issueIds the issue ids
+     * @return the list of answers
+     */
+    public abstract List<Answer> getAnswersForIssues(List<Long> issueIds);
+
+    /**
      * Add an answer
      * @param qid the question id
      * @param issueId the issue id

@@ -4,9 +4,7 @@
 package ro.agrade.jira.qanda;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.annotation.*;
 
 /**
  * The question.
@@ -16,8 +14,6 @@ import javax.xml.bind.annotation.*;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.PROPERTY)
 public class Question {
     private long id;
     private String questionText;
@@ -27,11 +23,6 @@ public class Question {
     private QuestionStatus status;
     private List<Answer> answers;
 
-    /**
-     * Constructor, default, required by JAXB
-     */
-    public Question() {
-    }
 
     /**
      * Base fields for the question

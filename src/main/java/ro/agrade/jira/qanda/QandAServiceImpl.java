@@ -5,8 +5,16 @@ package ro.agrade.jira.qanda;
 
 import java.util.*;
 
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.index.DefaultIndexManager;
+import com.atlassian.jira.issue.search.*;
+import com.atlassian.jira.jql.builder.JqlQueryBuilder;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.JiraAuthenticationContextImpl;
+import com.atlassian.jira.web.bean.PagerFilter;
+import com.atlassian.query.Query;
 
 import ro.agrade.jira.qanda.dao.AnswerDataService;
 import ro.agrade.jira.qanda.dao.QuestionDataService;
@@ -25,13 +33,19 @@ public class QandAServiceImpl implements QandAService {
     private final QuestionDataService qImpl;
     private final AnswerDataService aImpl;
     private final IssueManager issueManager;
+    private final JiraAuthenticationContext authContext;
+    private final SearchProvider searchProvider;
 
     public QandAServiceImpl(final IssueManager issueManager,
+                            final JiraAuthenticationContext authContext,
+                            final SearchProvider searchProvider,
                             final QuestionDataService qImpl,
                             final AnswerDataService aImpl) {
         this.qImpl = qImpl;
         this.aImpl = aImpl;
         this.issueManager = issueManager;
+        this.authContext = authContext;
+        this.searchProvider = searchProvider;
     }
 
     /**
@@ -47,7 +61,8 @@ public class QandAServiceImpl implements QandAService {
         }
         Issue issue = issueManager.getIssueObject(key);
         List<Question> questionList = qImpl.getQuestionsForIssue(issue.getId());
-        questionList = compileQuestionsWithAnswers(issue, questionList);
+        List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
+        questionList = compileQuestionsWithAnswers(questionList, answers);
         if(LOG.isDebugEnabled()) {
             LOG.debug(String.format("Done loading questions for issue %s", key));
         }
@@ -61,55 +76,83 @@ public class QandAServiceImpl implements QandAService {
     }
 
     // Unfortunately, Qfbiz simply doesn't know too much about joins
-    private List<Question> compileQuestionsWithAnswers(Issue issue, List<Question> questionList) {
+    private List<Question> compileQuestionsWithAnswers(List<Question> questionList, List<Answer> answers) {
         if(questionList == null) {
             return new ArrayList<Question>();
         }
-        //manual hash join
+        if(answers == null) {
+            return questionList;
+        }
+        //manual inner join (using a hash)
         Map<Long, Question> questionsMap = new HashMap<Long, Question>();
         for(Question q : questionList) {
             questionsMap.put(q.getId(), q);
         }
-        List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
-        if(answers != null) {
-            for(Answer a : answers) {
-                Question q = questionsMap.get(a.getQuestionId());
-                if(q == null) {
-                    LOG.warn(String.format("Got answer %d, but could not find the question %d ?!?",
-                                           a.getAnswerId(), a.getQuestionId()));
-                    continue;
-                }
-                q.getAnswers().add(a);
+        for(Answer a : answers) {
+            Question q = questionsMap.get(a.getQuestionId());
+            if(q == null) {
+                LOG.warn(String.format("Got answer %d, but could not find the question %d ?!?",
+                                       a.getAnswerId(), a.getQuestionId()));
+                continue;
             }
+            q.getAnswers().add(a);
         }
         return questionList;
     }
 
-//    //::TODO:: PANEL
-//    /**
-//     * Get all the questions which are unresolved for the specified project
-//     *
-//     * @param project the project
-//     * @return the project questions
-//     */
-//    @Override
-//    public List<Question> getUnsolvedQuestionsForProject(String project) {
-//        if(LOG.isDebugEnabled()) {
-//            LOG.debug(String.format("Loading questions for project %s", project));
-//        }
-//        List<Question> questionList = qImpl.getUnresolvedQuestionsForProject(project);
-//        questionList = compileQuestionsWithAnswers(questionList);
-//        Collections.sort(questionList, new Comparator<Question>() {
-//            @Override
-//            public int compare(Question o1, Question o2) {
-//                return (int)(o1.getTimeStamp() - o2.getTimeStamp());
-//            }
-//        });
-//        if(LOG.isDebugEnabled()) {
-//            LOG.debug(String.format("Done loading questions for project %s", project));
-//        }
-//        return questionList;
-//    }
+    /**
+     * Get all the questions which are unresolved for the specified project
+     *
+     * @param project the project
+     * @param timePeriod the time period taken into account
+     * @return the project questions
+     */
+    @Override
+    public List<Question>
+    getUnsolvedQuestionsForProject(String project, TimePeriod timePeriod) {
+        try {
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Loading questions for project %s", project));
+            }
+            JqlQueryBuilder jqlQueryBuilder = JqlQueryBuilder.newBuilder();
+            jqlQueryBuilder.where().resolution().isEmpty();
+            jqlQueryBuilder.where().and().project().eq(project);
+            jqlQueryBuilder.where().and().updatedAfter(timePeriod.getDateFromNow());
+
+            Query query = jqlQueryBuilder.buildQuery();
+
+            User user = authContext.getLoggedInUser();
+            DefaultIndexManager.flushThreadLocalSearchers();
+            JiraAuthenticationContextImpl.clearRequestCache();
+
+            SearchResults results = searchProvider.search(query, user, PagerFilter.getUnlimitedFilter());
+
+            List<Issue> issues = results.getIssues();
+            List<Long> issueIds = new ArrayList<Long>();
+            for(Issue iss : issues) {
+                issueIds.add(iss.getId());
+            }
+
+            List<Question> questionList = qImpl.getUnresolvedQuestionsForIssues(issueIds);
+            List<Answer> answerList = aImpl.getAnswersForIssues(issueIds);
+
+            questionList = compileQuestionsWithAnswers(questionList, answerList);
+            Collections.sort(questionList, new Comparator<Question>() {
+                @Override
+                public int compare(Question o1, Question o2) {
+                    return (int)(o1.getTimeStamp() - o2.getTimeStamp());
+                }
+            });
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Done loading questions for project %s", project));
+            }
+            return questionList;
+        } catch (SearchException e) {
+            String msg = "Exception while getting questions for project " + project;
+            LOG.error(msg, e);
+            throw new QandAException(msg, e);
+        }
+    }
 
     /**
      * Adds a question

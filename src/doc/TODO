@@ -1,14 +1,10 @@
 
 MUST DO:
 Technical stuff:
-a) Answers should be taken via a REST call, not directly in the VT (velocity template).
-b) Clear the beans, separate clearly the UI from base to limit the network transported data.
 c) UI changes:
     c.1) Gadget styles + add Issue summary
-    c.2) First question is special
 d) Base:
-    d.1) Create special routines (question has answers), etc
-    d.2) Put same checks on REST services too. Right now checks happen only in VT
+    d.2) RADU: Put same checks on REST services too. Right now checks happen only in VT
 
 1. If answer is approved:
 Add to description functionality. Add to comments functionality
@@ -17,6 +13,8 @@ Add to description functionality. Add to comments functionality
 Impr: if we do not have an answer, we should be able to edit the question
 Impr: if the answer is not approved, we should be able to edit the answer
 
-3. Localization of qanda.js, gadget, etc
+3. FLORIN: Localization of qanda.js, gadget, etc
+
+BUG: pe panel-ul all nu reactioneaza ... cred ca e din motive de bind ?!?
 
 

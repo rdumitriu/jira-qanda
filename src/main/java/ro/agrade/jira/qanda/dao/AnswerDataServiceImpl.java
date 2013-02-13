@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataService  {
     private static final Log LOG = LogFactory.getLog(AnswerDataServiceImpl.class);
     private final GenericDelegator delegator;
+    private static final int INPAGE = 950;
 
     /**
      * Constructor
@@ -48,6 +49,41 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
             return fromGenericValue(list);
         } catch(GenericEntityException e) {
             String msg = String.format("Could not load question(%d) answers ?!?", qid);
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    /**
+     * Gets all the answers that are designated for a list of issues
+     *
+     * @param issueIds the issue ids
+     * @return the list of answers
+     */
+    @Override
+    public List<Answer> getAnswersForIssues(List<Long> issueIds) {
+        try {
+            List<Answer> results = new ArrayList<Answer>();
+            int i = 0;
+            while( i < issueIds.size() ) {
+                //copy between i and i + page
+                List<Long> subqids = new ArrayList<Long>();
+                for(int ndx = i; ndx < i + INPAGE && ndx < issueIds.size(); ndx++) {
+                    subqids.add(issueIds.get(ndx));
+                }
+                i += INPAGE;
+                if(subqids.size() > 0) {
+                    List<EntityCondition> conds = new ArrayList<EntityCondition>();
+                    conds.add(new EntityExpr(ISSUEID_FIELD, EntityOperator.IN, subqids));
+                    conds.add(new EntityExpr(DELETED_FIELD, EntityOperator.EQUALS, "N"));
+
+                    List<GenericValue> list = delegator.findByAnd(ENTITY, conds);
+                    results.addAll(fromGenericValue(list));
+                }
+            }
+            return results;
+        } catch(GenericEntityException e) {
+            String msg = "Could not load answers ?!?";
             LOG.error(msg);
             throw new OfbizDataException(msg, e);
         }

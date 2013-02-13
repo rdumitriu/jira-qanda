@@ -16,6 +16,21 @@ var QANDAGADGET = (function() {
         return ret;
     }
 
+    function getIssueInterval(baseUrl) {
+        var ret;
+        AJS.$.ajax({
+            type: 'GET',
+            url: baseUrl + "/rest/agrade/qanda/latest/gadget/intervals",
+            async: false,
+            data: {
+            },
+            success: function(data){
+                ret = data;
+            }
+        });
+        return ret;
+    }
+
 
     function getTemplate(gadget, args, baseUrl) {
         // reset view
@@ -32,7 +47,8 @@ var QANDAGADGET = (function() {
             type: 'POST',
             url: baseUrl + "/rest/agrade/qanda/latest/gadget/getquestions",
             data: {
-                project: gadget.getPref("project")
+                project: gadget.getPref("project"),
+                interval: gadget.getPref("issinterval"),
             },
             success: function(data){
                 gadget.hideLoading();
@@ -42,7 +58,7 @@ var QANDAGADGET = (function() {
                     var html = "<table class='aui' border='0'>";
                     for(var i = 0; i < data.length; i++) {
                         html += "<tr>";
-                        html += "<td><a href='" + baseUrl + "/browse/" + data[i].issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + data[i].issueKey + "</a>";
+                        html += "<td><a href='" + baseUrl + "/browse/" + data[i].issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + data[i].issueKey + "" + data[i].issueSummary + "</a>";
                         html += "<div style='margin-left: 10px;'>";
                         if(!data[i].answered) {
                             html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-default'>No answer</span>";
@@ -87,6 +103,16 @@ var QANDAGADGET = (function() {
                     type: "select",
                     selected: gadget.getPref("project"),
                     options: getProjects(baseUrl)
+                },
+                {
+                    id: "interval-field",
+                    class: "aui",
+                    userpref: "issinterval",
+                    label: "Looking back interval",
+                    description:"Choose the interval to examine issues with questions",
+                    type: "select",
+                    selected: gadget.getPref("issinterval"),
+                    options: getIssueInterval(baseUrl)
                 },
             ]
         };

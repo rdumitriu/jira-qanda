@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans" xmlns:osgi="http://www.springframework.org/schema/osgi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd" default-autowire="autodetect" osgi:default-timeout="30000">
+
+    <beans:bean id="rendererManager" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=rendererManager)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.issue.RendererManager</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="jiraAuthenticationContext" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=jiraAuthenticationContext)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.security.JiraAuthenticationContext</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="applicationProperties212" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=applicationProperties)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.config.properties.ApplicationProperties</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="webResourceManager" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=webResourceManager)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.plugin.webresource.WebResourceManager</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="permissionManager" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=permissionManager)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.security.PermissionManager</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="issueManager" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=issueManager)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.issue.IssueManager</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <beans:bean id="userManager" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=userManager)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.user.util.UserManager</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+    <beans:bean id="searchProvider" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=searchProvider)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.jira.issue.search.SearchProvider</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+
+
+  <beans:bean id="avatarService" lazy-init="true" class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+    <beans:property name="filter" value="(&amp;(bean-name=avatarService)(plugins-host=true))"/>
+    <beans:property name="interfaces">
+      <beans:list>
+        <beans:value>com.atlassian.jira.avatar.AvatarService</beans:value>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+</beans:beans>

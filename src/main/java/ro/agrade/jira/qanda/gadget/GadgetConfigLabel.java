@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 1.0
  */
 @XmlRootElement
-public class ProjectLabel {
+public class GadgetConfigLabel {
     @XmlElement
     public String label;
     @XmlElement
