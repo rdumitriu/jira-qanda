@@ -9,6 +9,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import org.ofbiz.core.entity.*;
 
 import ro.agrade.jira.qanda.*;
+import ro.agrade.jira.qanda.utils.BaseUserAwareService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataService  {
+public class AnswerDataServiceImpl extends BaseUserAwareService implements AnswerDataService  {
     private static final Log LOG = LogFactory.getLog(AnswerDataServiceImpl.class);
     private final GenericDelegator delegator;
     private static final int INPAGE = 950;
@@ -31,6 +32,26 @@ public class AnswerDataServiceImpl extends BaseDaoService implements AnswerDataS
     public AnswerDataServiceImpl(JiraAuthenticationContext authContext) {
         super(authContext);
         this.delegator = GenericDelegator.getGenericDelegator("default");
+    }
+
+    /**
+     * Gets one single answer
+     *
+     * @param aid the answer id
+     * @return the answer
+     */
+    @Override
+    public Answer getAnswer(long aid) {
+        try {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put(ID_FIELD, aid);
+            GenericValue val = delegator.findByPrimaryKey(delegator.makePK(ENTITY, map));
+            return fromGenericValue(val);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not load answer %d ?!?", aid);
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
     }
 
     /**

@@ -14,6 +14,14 @@ import java.util.List;
  * @since 1.0
  */
 public interface AnswerDataService {
+
+    /**
+     * Gets one single answer
+     * @param aid the answer id
+     * @return the answer
+     */
+    public abstract Answer getAnswer(long aid);
+
     /**
      * Gets all the answers for the question
      * @param qid the question id

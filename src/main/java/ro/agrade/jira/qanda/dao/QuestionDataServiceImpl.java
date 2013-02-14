@@ -10,6 +10,7 @@ import org.ofbiz.core.entity.*;
 
 import ro.agrade.jira.qanda.Question;
 import ro.agrade.jira.qanda.QuestionStatus;
+import ro.agrade.jira.qanda.utils.BaseUserAwareService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class QuestionDataServiceImpl extends BaseDaoService implements QuestionDataService {
+public class QuestionDataServiceImpl extends BaseUserAwareService implements QuestionDataService {
     private static final Log LOG = LogFactory.getLog(QuestionDataServiceImpl.class);
     private final GenericDelegator delegator;
     private static final int INPAGE = 950;

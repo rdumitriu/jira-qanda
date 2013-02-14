@@ -1,8 +1,9 @@
 /*
  * Created on 1/28/13
  */
-package ro.agrade.jira.qanda.dao;
+package ro.agrade.jira.qanda.utils;
 
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 
 /**
@@ -14,14 +15,14 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class BaseDaoService {
+public class BaseUserAwareService {
     private final JiraAuthenticationContext authContext;
 
     /**
      * Constructor
      * @param authContext this is to be injected
      */
-    public BaseDaoService(JiraAuthenticationContext authContext) {
+    public BaseUserAwareService(JiraAuthenticationContext authContext) {
         this.authContext = authContext;
     }
 
@@ -40,5 +41,14 @@ public class BaseDaoService {
      */
     public String getCurrentUser() {
         return authContext.getLoggedInUser().getName();
+    }
+
+    /**
+     * Gets the current user
+     *
+     * @return the current user
+     */
+    public User getCurrentUserObject() {
+        return authContext.getLoggedInUser();
     }
 }

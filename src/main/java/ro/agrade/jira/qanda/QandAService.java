@@ -72,10 +72,9 @@ public interface QandAService {
     /**
      * Add an answer to a question
      * @param qid the question id
-     * @param issueKey the issue key
      * @param answer the text
      */
-    void addAnswer(long qid, String issueKey, String answer);
+    void addAnswer(long qid, String answer);
 
     /**
      * Deletes an answer

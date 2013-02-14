@@ -14,6 +14,7 @@ import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import ro.agrade.jira.qanda.QandAService;
 import ro.agrade.jira.qanda.Question;
+import ro.agrade.jira.qanda.utils.PermissionChecker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
         User currentUser = authContext.getLoggedInUser();
-        boolean canOverrideActions = userCanOverrideActions(currentUser, issue);
+        boolean canOverrideActions = PermissionChecker.isUserLeadOrAdmin(permissionManager, issue, currentUser);
         UIFormatter formatter = new UIFormatter(userManager, authContext, properties, rendererMgr, issue);
         String baseURL = properties.getString("jira.baseurl");
 
@@ -80,29 +81,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
     @Override
     public boolean showPanel(Issue issue, User user) {
-        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user) &&
-               permissionManager.hasPermission(Permissions.BROWSE, issue.getProjectObject(), user);
+        return PermissionChecker.canViewIssue(permissionManager, issue, user);
     }
-
-    private boolean userCanOverrideActions(User currentUser, Issue issue) {
-        if(permissionManager.hasPermission(Permissions.ADMINISTER, currentUser) ||
-                permissionManager.hasPermission(Permissions.PROJECT_ADMIN, issue.getProjectObject(), currentUser) ||
-                permissionManager.hasPermission(Permissions.SYSTEM_ADMIN, currentUser)) {
-            return true;
-        }
-        if(issue.getProjectObject().getLead() != null &&
-                issue.getProjectObject().getLead().getName().equals(currentUser.getName())) {
-            return true;
-        }
-        if(issue.getComponentObjects() != null) {
-            for(ProjectComponent cmpt : issue.getComponentObjects()) {
-                if(cmpt.getLead() != null && cmpt.getLead().equals(currentUser.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 
 }

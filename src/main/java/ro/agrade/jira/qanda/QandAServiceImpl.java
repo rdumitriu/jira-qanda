@@ -11,13 +11,14 @@ import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.index.DefaultIndexManager;
 import com.atlassian.jira.issue.search.*;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.JiraAuthenticationContextImpl;
+import com.atlassian.jira.security.*;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 
 import ro.agrade.jira.qanda.dao.AnswerDataService;
 import ro.agrade.jira.qanda.dao.QuestionDataService;
+import ro.agrade.jira.qanda.utils.BaseUserAwareService;
+import ro.agrade.jira.qanda.utils.PermissionChecker;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,24 +29,26 @@ import org.apache.commons.logging.LogFactory;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class QandAServiceImpl implements QandAService {
+public class QandAServiceImpl extends BaseUserAwareService implements QandAService {
     private static final Log LOG = LogFactory.getLog(QandAServiceImpl.class);
     private final QuestionDataService qImpl;
     private final AnswerDataService aImpl;
     private final IssueManager issueManager;
-    private final JiraAuthenticationContext authContext;
     private final SearchProvider searchProvider;
+    private final PermissionManager permissionManager;
 
     public QandAServiceImpl(final IssueManager issueManager,
                             final JiraAuthenticationContext authContext,
                             final SearchProvider searchProvider,
+                            final PermissionManager permissionManager,
                             final QuestionDataService qImpl,
                             final AnswerDataService aImpl) {
+        super(authContext);
         this.qImpl = qImpl;
         this.aImpl = aImpl;
         this.issueManager = issueManager;
-        this.authContext = authContext;
         this.searchProvider = searchProvider;
+        this.permissionManager = permissionManager;
     }
 
     /**
@@ -121,7 +124,7 @@ public class QandAServiceImpl implements QandAService {
 
             Query query = jqlQueryBuilder.buildQuery();
 
-            User user = authContext.getLoggedInUser();
+            User user = getCurrentUserObject();
             DefaultIndexManager.flushThreadLocalSearchers();
             JiraAuthenticationContextImpl.clearRequestCache();
 
@@ -163,6 +166,7 @@ public class QandAServiceImpl implements QandAService {
     @Override
     public void addQuestion(String issueKey, String question) {
         Issue issue = issueManager.getIssueObject(issueKey);
+        checkQuestionAddPermission(issue);
         qImpl.addQuestion(issue.getId(), question);
     }
 
@@ -173,6 +177,11 @@ public class QandAServiceImpl implements QandAService {
      */
     @Override
     public void deleteQuestion(long qid) {
+        Question q = qImpl.getQuestion(qid);
+        if(q == null) {
+            return;
+        }
+        checkQuestionPermission(q);
         qImpl.removeQuestion(qid);
     }
 
@@ -183,8 +192,14 @@ public class QandAServiceImpl implements QandAService {
      * @param answer the text
      */
     @Override
-    public void addAnswer(long qid, String issueKey, String answer) {
-        Issue issue = issueManager.getIssueObject(issueKey);
+    public void addAnswer(long qid, String answer) {
+        Question q = qImpl.getQuestion(qid);
+        if(q == null) {
+            LOG.error("Question may be already deleted");
+            return;
+        }
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
+        checkAnswerAddPermission(issue);
         aImpl.addAnswer(qid, issue.getId(), answer);
     }
 
@@ -195,6 +210,8 @@ public class QandAServiceImpl implements QandAService {
      */
     @Override
     public void deleteAnswer(long aid) {
+        Answer a = aImpl.getAnswer(aid);
+        checkAnswerPermission(a);
         aImpl.removeAnswer(aid);
     }
 
@@ -216,6 +233,7 @@ public class QandAServiceImpl implements QandAService {
             }
             return;
         }
+        checkAnswerPermission(a);
         Question q = qImpl.getQuestion(a.getQuestionId());
         if(q == null) {
             if(LOG.isDebugEnabled()) {
@@ -252,5 +270,31 @@ public class QandAServiceImpl implements QandAService {
             }
         }
         return false;
+    }
+
+    private void checkQuestionAddPermission(Issue issue) {
+        //does nothing at this point
+    }
+
+    private void checkQuestionPermission(Question q) {
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
+        if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), q.getUser())) {
+            String msg = String.format("Permission violation while accessing question %d", q.getId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
+    }
+
+    private void checkAnswerAddPermission(Issue issue) {
+        //does nothing at this point
+    }
+
+    private void checkAnswerPermission(Answer a) {
+        Issue issue = issueManager.getIssueObject(a.getIssueId());
+        if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), a.getUser())) {
+            String msg = String.format("Permission violation while accessing answer %d", a.getAnswerId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
     }
 }

@@ -58,7 +58,7 @@ var QANDAGADGET = (function() {
                     var html = "<table class='aui' border='0'>";
                     for(var i = 0; i < data.length; i++) {
                         html += "<tr>";
-                        html += "<td><a href='" + baseUrl + "/browse/" + data[i].issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + data[i].issueKey + "" + data[i].issueSummary + "</a>";
+                        html += "<td><a href='" + baseUrl + "/browse/" + data[i].issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + data[i].issueKey + "</a> " + data[i].issueSummary;
                         html += "<div style='margin-left: 10px;'>";
                         if(!data[i].answered) {
                             html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-default'>No answer</span>";
