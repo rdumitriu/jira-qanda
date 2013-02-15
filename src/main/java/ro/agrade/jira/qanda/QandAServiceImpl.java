@@ -6,12 +6,15 @@ package ro.agrade.jira.qanda;
 import java.util.*;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.event.type.EventDispatchOption;
+import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.index.DefaultIndexManager;
+import com.atlassian.jira.issue.index.IssueIndexManager;
 import com.atlassian.jira.issue.search.*;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.security.*;
+import com.atlassian.jira.util.BuildUtilsInfoImpl;
+import com.atlassian.jira.util.ImportUtils;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 
@@ -34,10 +37,12 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     private final QuestionDataService qImpl;
     private final AnswerDataService aImpl;
     private final IssueManager issueManager;
+    private final IssueIndexManager issueIndexManager;
     private final SearchProvider searchProvider;
     private final PermissionManager permissionManager;
 
     public QandAServiceImpl(final IssueManager issueManager,
+                            final IssueIndexManager issueIndexManager,
                             final JiraAuthenticationContext authContext,
                             final SearchProvider searchProvider,
                             final PermissionManager permissionManager,
@@ -47,6 +52,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         this.qImpl = qImpl;
         this.aImpl = aImpl;
         this.issueManager = issueManager;
+        this.issueIndexManager = issueIndexManager;
         this.searchProvider = searchProvider;
         this.permissionManager = permissionManager;
     }
@@ -158,6 +164,54 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     }
 
     /**
+     * Loads a question, along with the answers
+     *
+     * @param qid the key
+     * @return the loaded question, null if it was deleted.
+     */
+    @Override
+    public Question loadQuestion(long qid) {
+        Question ret = qImpl.getQuestion(qid);
+        if(ret == null) {
+            return null;
+        }
+        List<Answer> answers = aImpl.getAnswersForQuestion(qid);
+        ret.setAnswers(answers != null ? answers : new ArrayList<Answer>());
+        return ret;
+    }
+
+    /**
+     * Gets only the text, useful for editing the question
+     *
+     * @param qid the question id
+     * @return the text of the question, null if the question was already deleted
+     */
+    @Override
+    public String getQuestionText(long qid) {
+        Question q = qImpl.getQuestion(qid);
+        return q != null ? q.getQuestionText() : null;
+    }
+
+    /**
+     * Be given a question, this routine adds it into the description of the issue
+     *
+     * @param qid the question id
+     */
+    @Override
+    public void addQuestionToIssue(long qid) {
+        Question q = loadQuestion(qid);
+        if(q == null) {
+            //just return
+            return;
+        }
+        MutableIssue issue = issueManager.getIssueObject(q.getIssueId());
+        checkEditIssuePermission(q, issue);
+        //format text for the question and throw it back into the issue
+        String textToAdd = calculateText(q);
+        updateIssueDescription(issue, textToAdd);
+    }
+
+    /**
      * Adds a question
      *
      * @param issueKey the issue key
@@ -168,6 +222,22 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(issueKey);
         checkQuestionAddPermission(issue);
         qImpl.addQuestion(issue.getId(), question);
+    }
+
+    /**
+     * Edits a question
+     *
+     * @param qid      the question id
+     * @param question the question text
+     */
+    @Override
+    public void editQuestion(long qid, String question) {
+        Question q = qImpl.getQuestion(qid);
+        if(q == null) {
+            return;
+        }
+        checkQuestionPermission(q);
+        qImpl.updateQuestion(qid, question);
     }
 
     /**
@@ -183,6 +253,18 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         }
         checkQuestionPermission(q);
         qImpl.removeQuestion(qid);
+    }
+
+    /**
+     * Gets only the text, useful for editing the question
+     *
+     * @param aid the answer id
+     * @return the text of the answer, null if the answer was already deleted
+     */
+    @Override
+    public String getAnswerText(long aid) {
+        Answer a = aImpl.getAnswer(aid);
+        return a != null ? a.getAnswerText() : null;
     }
 
     /**
@@ -204,6 +286,22 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     }
 
     /**
+     * Edits an answer
+     *
+     * @param aid    the answer id
+     * @param answer the answer text
+     */
+    @Override
+    public void editAnswer(long aid, String answer) {
+        Answer a = aImpl.getAnswer(aid);
+        if(a == null) {
+            return;
+        }
+        checkAnswerPermission(a, true);
+        aImpl.updateAnswer(aid, answer);
+    }
+
+    /**
      * Deletes an answer
      *
      * @param aid the answer id
@@ -211,7 +309,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     @Override
     public void deleteAnswer(long aid) {
         Answer a = aImpl.getAnswer(aid);
-        checkAnswerPermission(a);
+        if(a == null) {
+            return;
+        }
+        checkAnswerPermission(a, true);
         aImpl.removeAnswer(aid);
     }
 
@@ -233,7 +334,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             }
             return;
         }
-        checkAnswerPermission(a);
+        checkAnswerPermission(a, false);
         Question q = qImpl.getQuestion(a.getQuestionId());
         if(q == null) {
             if(LOG.isDebugEnabled()) {
@@ -272,11 +373,38 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         return false;
     }
 
+    private void checkEditIssuePermission(Question q, MutableIssue issue) {
+        if(!q.isClosed()) {
+            String msg = String.format("Cannot add question id %d (still open)", q.getId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
+        if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), q.getUser())) {
+            String msg = String.format("Permission violation while accessing question %d", q.getId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
+        if(!PermissionChecker.isIssueEditable(permissionManager, issue, getCurrentUserObject())) {
+            String msg = String.format("Permission violation while accessing question %d", q.getId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
+    }
+
     private void checkQuestionAddPermission(Issue issue) {
-        //does nothing at this point
+        if(!PermissionChecker.canViewIssue(permissionManager, issue, getCurrentUserObject())) {
+            String msg = "Permission violation while adding question for issue:" + issue.getKey();
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
     }
 
     private void checkQuestionPermission(Question q) {
+        if(q.isClosed()) {
+            String msg = String.format("Cannot modify question id %d (already closed)", q.getId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), q.getUser())) {
             String msg = String.format("Permission violation while accessing question %d", q.getId());
@@ -286,15 +414,76 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     }
 
     private void checkAnswerAddPermission(Issue issue) {
-        //does nothing at this point
+        if(!PermissionChecker.canViewIssue(permissionManager, issue, getCurrentUserObject())) {
+            String msg = "Permission violation while adding answer for issue:" + issue.getKey();
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
     }
 
-    private void checkAnswerPermission(Answer a) {
+    private void checkAnswerPermission(Answer a, boolean checkStatus) {
+        if(checkStatus && a.isAccepted()) {
+            String msg = String.format("Cannot modify answer id %d (already accepted)", a.getAnswerId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
         Issue issue = issueManager.getIssueObject(a.getIssueId());
         if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), a.getUser())) {
             String msg = String.format("Permission violation while accessing answer %d", a.getAnswerId());
             LOG.error(msg);
             throw new QandAPermissionException(msg);
         }
+    }
+
+
+    private void updateIssueDescription(MutableIssue issue, String description) {
+        String origText = issue.getDescription();
+        issue.setDescription(origText + description);
+
+        boolean wasIndexing =  ImportUtils.isIndexIssues();
+        ImportUtils.setIndexIssues(true);
+        try {
+            // updateIssue (should) also handle the re-index of the issue
+            issueManager.updateIssue(getCurrentUserObject(), issue,
+                    EventDispatchOption.ISSUE_UPDATED,
+                    true);
+            try {
+                String version = new BuildUtilsInfoImpl().getVersion();
+                if(version.startsWith("5.0")) {
+                    issueIndexManager.reIndex(issue);
+                } else {
+                    issueIndexManager.release();
+                    issueIndexManager.reIndex(issue);
+                    issueIndexManager.release();
+                }
+            } catch(Exception ex) {
+                LOG.warn("Could not reindex ?!?.", ex);
+                throw ex;
+            }
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Updated issue >>%s<<", issue.getKey()));
+            }
+        } catch(Exception ex) {
+            String msg = String.format("Update failed for issue >>%s<<, error was %s",
+                                       issue.getKey(), ex);
+            LOG.error(msg);
+            throw new QandAException(msg, ex);
+        } finally {
+            ImportUtils.setIndexIssues(wasIndexing);
+        }
+    }
+
+    private String calculateText(Question q) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n{quote}Q:")
+          .append(q.getQuestionText())
+          .append("\n");
+        for(Answer a : q.getAnswers()) {
+            if(a.isAccepted()) {
+                sb.append("A:").append(a.getAnswerText()).append("\n");
+            }
+        }
+        sb.append("{quote}\n");
+        return sb.toString();
     }
 }

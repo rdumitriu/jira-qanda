@@ -13,11 +13,14 @@ import ro.agrade.jira.qanda.dao.GenericDelegatorLoader;
 
 
 /**
+ * <p>
  * Our plugins will come to life in init and will die in destroy. OSGI defines
  * a very clear lifecycle, so we can use it to register / unregister our
  * components.
+ * </p>
+ * <p>
  * Of course, you will have to insert in your manifest entries like:
- *
+ *</p>
  * <pre>
  * Bundle-Name: Project name
  * Bundle-Description: Project Description

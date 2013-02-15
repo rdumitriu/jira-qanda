@@ -55,6 +55,13 @@ public interface AnswerDataService {
     /**
      * Removes an answer
      * @param aid the answer id
+     * @param answerText the answer text
+     */
+    public abstract void updateAnswer(long aid, String answerText);
+
+    /**
+     * Removes an answer
+     * @param aid the answer id
      */
     public abstract void removeAnswer(long aid);
 

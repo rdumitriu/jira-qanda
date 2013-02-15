@@ -46,6 +46,13 @@ public interface QuestionDataService {
     public abstract void addQuestion(long issueId, String question);
 
     /**
+     * Edit a question
+     * @param qid the id of the question
+     * @param questionText the text
+     */
+    public abstract void updateQuestion(long qid, String questionText);
+
+    /**
      * Deletes a question
      * @param qid the question id
      */

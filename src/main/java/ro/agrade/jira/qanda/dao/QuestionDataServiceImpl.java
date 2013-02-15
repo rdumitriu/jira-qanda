@@ -128,6 +128,26 @@ public class QuestionDataServiceImpl extends BaseUserAwareService implements Que
         }
     }
 
+    /**
+     * Edit a question.
+     * ::TODO:: we should store who edited it in the future ...
+     *
+     * @param qid      the id of the question
+     * @param questionText the text
+     */
+    @Override
+    public void updateQuestion(long qid, String questionText) {
+        try {
+            GenericValue v = delegator.findByPrimaryKey(makePk(qid));
+            v.setString(TEXT_FIELD, questionText);
+            delegator.store(v);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not remove question %d ?!?", qid);
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
     @Override
     public void removeQuestion(long qid) {
         try {

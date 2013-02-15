@@ -14,6 +14,17 @@
         <!--url>http://www.example.com/</url-->
     </organization>
 
+    <developers>
+        <developer>
+            <name>Radu Dumitriu</name>
+            <email>rdumitriu@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Florin Manaila</name>
+            <email>florin.manaila@kepler-rominfo.com</email>
+        </developer>
+    </developers>
+
     <name>qanda</name>
     <description>This is the ro.agrade.jira:qanda plugin for Atlassian JIRA.</description>
     <packaging>atlassian-plugin</packaging>
@@ -151,8 +162,8 @@
     </build>
 
     <properties>
-        <jira.version>5.0.1</jira.version>
-        <jira.data.version>5.0.1</jira.data.version>
+        <jira.version>5.1</jira.version>
+        <jira.data.version>5.1</jira.data.version>
         <amps.version>4.1.4</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

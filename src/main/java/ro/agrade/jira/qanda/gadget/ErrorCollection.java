@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * ::TODO:: documentation
+ * This is required by the gadget configuration
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0

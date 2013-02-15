@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Our rest service
+ * Our rest service for the panel
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
@@ -31,6 +31,10 @@ public class PanelRestService {
         this.service = service;
     }
 
+    /* ================================================================
+     * Q U E S T I O N  M G M T
+     * ================================================================ */
+
     @POST
     @Path("/addquestion")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
@@ -45,6 +49,46 @@ public class PanelRestService {
         }
         service.addQuestion(issueKey, question);
         return true;
+    }
+
+    @POST
+    @Path("/questiontext")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getQuestionText(@FormParam("questionId") String qId) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Getting question text:" + qId);
+        }
+        if(qId == null) {
+            return null;
+        }
+        try {
+            return service.getQuestionText(Long.parseLong(qId));
+        } catch (NumberFormatException e) {
+            LOG.error("Question id >" + qId + "< doesn't seem exactly an id");
+        }
+        return null;
+    }
+
+    @POST
+    @Path("/editquestion")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public boolean editQuestion(@FormParam("questionId") String qId,
+                                @FormParam("question") String question) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Editing question:" + qId + " >>" + question + "<<");
+        }
+        if(qId == null || question == null) {
+            return false;
+        }
+        try {
+            service.editQuestion(Long.parseLong(qId), question);
+            return true;
+        } catch (NumberFormatException e) {
+            LOG.error("Question id >" + qId + "< doesn't seem exactly an id");
+        }
+        return false;
     }
 
     @POST
@@ -68,8 +112,28 @@ public class PanelRestService {
     }
 
     /* ================================================================
-     * ANSWER MGMT
+     * A N S W E R  M G M T
      * ================================================================ */
+
+    @POST
+    @Path("/answertext")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String getAnswerText(@FormParam("answerId") String answerId) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Getting answer text:" + answerId );
+        }
+        if(answerId == null) {
+            return null;
+        }
+        try {
+            return service.getAnswerText(Long.parseLong(answerId));
+        } catch (NumberFormatException e) {
+            LOG.error("Answer id >" + answerId + "< doesn't seem exactly an id");
+        }
+        return null;
+    }
+
 
     @POST
     @Path("/addanswer")
@@ -88,6 +152,27 @@ public class PanelRestService {
             return true;
         } catch (NumberFormatException e) {
             LOG.error("Question id >" + questionId + "< doesn't seem to be an id");
+        }
+        return false;
+    }
+
+    @POST
+    @Path("/editanswer")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public boolean editAnswer(@FormParam("answerId") String answerId,
+                              @FormParam("answer") String answer) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Edit answer:" + answerId + " >>" + answer + "<<");
+        }
+        if(answerId == null || answer == null) {
+            return false;
+        }
+        try {
+            service.editAnswer(Long.parseLong(answerId), answer);
+            return true;
+        } catch (NumberFormatException e) {
+            LOG.error("Answer id >" + answerId + "< doesn't seem exactly an id");
         }
         return false;
     }
@@ -133,4 +218,28 @@ public class PanelRestService {
         }
         return false;
     }
-}
+
+    /* ================================================================
+     * I S S U E  O P S
+     * ================================================================ */
+
+    @POST
+    @Path("/addtoissue")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public boolean addQuestionToIssue(@FormParam("questionId") String qId) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Commenting question:" + qId);
+        }
+        if(qId == null) {
+            return false;
+        }
+        try {
+            service.addQuestionToIssue(Long.parseLong(qId));
+            return true;
+        } catch (NumberFormatException e) {
+            LOG.error("Question id >" + qId + "< doesn't seem exactly an id");
+        }
+        return false;
+    }
+ }

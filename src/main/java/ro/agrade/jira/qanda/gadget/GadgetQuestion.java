@@ -3,14 +3,12 @@
  */
 package ro.agrade.jira.qanda.gadget;
 
-import java.util.*;
+
 import javax.xml.bind.annotation.*;
 
-import ro.agrade.jira.qanda.Answer;
-import ro.agrade.jira.qanda.QuestionStatus;
 
 /**
- * ::TODO:: documentation
+ * This is the bean which transports the info to the gadget
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0

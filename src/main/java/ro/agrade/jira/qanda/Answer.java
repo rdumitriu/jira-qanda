@@ -3,16 +3,12 @@
  */
 package ro.agrade.jira.qanda;
 
-//import javax.xml.bind.annotation.*;
-
 /**
  * The answer
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-//@XmlRootElement
-//@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Answer {
     private long answerId;
     private long questionId;
@@ -21,12 +17,6 @@ public class Answer {
     private String user;
     private long timeStamp;
     private boolean accepted;
-
-    /**
-     * Default constructor, required by JAXB
-     */
-    public Answer() {
-    }
 
     /**
      * The creation constructor, answer is not accepted

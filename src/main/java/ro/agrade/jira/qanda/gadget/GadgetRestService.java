@@ -46,15 +46,28 @@ public class GadgetRestService {
         this.permMgr = permMgr;
     }
 
+    /**
+     * Validates the gadget configuration
+     * @param project the project
+     * @param issinterval the interval
+     * @return always null
+     */
     @GET
     @Path("/validate")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
     @Produces({MediaType.APPLICATION_JSON})
     public ErrorCollection validate(@QueryParam("project") String project,
                                     @QueryParam("issinterval") String issinterval) {
+        //at this point, I see no reason to validate this ...
+        //of course it should, but I have no time for unlikely errors :)
         return null;
     }
 
+    /**
+     * Gets the projects accessible by this user
+     *
+     * @return the list of projects to be shown in the config ('Edit')
+     */
     @GET
     @Path("/projects")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
@@ -83,6 +96,11 @@ public class GadgetRestService {
         return lbls;
     }
 
+    /**
+     * Gets the intervals
+     *
+     * @return the intervals
+     */
     @GET
     @Path("/intervals")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
@@ -99,6 +117,12 @@ public class GadgetRestService {
     }
 
 
+    /**
+     * Gets the questions asked on the configured project for the given interval
+     * @param project the project
+     * @param interval the interval
+     * @return the questions
+     */
     @POST
     @Path("/getquestions")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
@@ -118,6 +142,10 @@ public class GadgetRestService {
         }
         return new ArrayList<GadgetQuestion>();
     }
+
+    /* ========================================================================
+     * I N T E R N A L  K I T C H E N
+     * ====================================================================== */
 
     private List<GadgetQuestion> formatQuestions(List<Question> questions) {
         List<GadgetQuestion> ret = new ArrayList<GadgetQuestion>();

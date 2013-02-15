@@ -154,6 +154,25 @@ public class AnswerDataServiceImpl extends BaseUserAwareService implements Answe
      * Removes an answer
      *
      * @param aid the answer id
+     * @param answerText the answer
+     */
+    @Override
+    public void updateAnswer(long aid, String answerText) {
+        try {
+            GenericValue v = delegator.findByPrimaryKey(makePk(aid));
+            v.setString(TEXT_FIELD, answerText);
+            delegator.store(v);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not remove answer %d ?!?", aid);
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    /**
+     * Removes an answer
+     *
+     * @param aid the answer id
      */
     @Override
     public void removeAnswer(long aid) {

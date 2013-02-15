@@ -6,6 +6,7 @@ package ro.agrade.jira.qanda.utils;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 
@@ -71,5 +72,16 @@ public class PermissionChecker {
     isUserOwner(PermissionManager permissionManager, Issue issue, User user, String owner) {
         return (owner.equals(user.getName()) ||
                 isUserLeadOrAdmin(permissionManager, issue, user));
+    }
+
+    /**
+     *
+     * @param permissionManager the permission manager
+     * @param issue the issue
+     * @param user the user
+     * @return true if s/he can edit the issue
+     */
+    public static boolean isIssueEditable(PermissionManager permissionManager, Issue issue, User user) {
+        return permissionManager.hasPermission(Permissions.EDIT_ISSUE, issue, user);
     }
 }
