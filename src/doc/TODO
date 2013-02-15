@@ -12,8 +12,6 @@ Impr: if the answer is not approved, we should be able to edit the answer
 
 3. FLORIN: Localization of qanda.js, gadget, etc
 
-BUG: pe panel-ul "All" nu reactioneaza ... cred ca e din motive de bind ?!? live / on
-
 FUTURE:
 1. Add to comments functionality
 2. Mails (one per day)

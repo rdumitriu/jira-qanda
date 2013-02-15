@@ -23,6 +23,7 @@ public class QandAIssueAction extends AbstractIssueAction {
     private final Issue issue;
     private final Question question;
     private final boolean canOverrideActions;
+    private final boolean canAddToIssueDescription;
     private final User currentUser;
     private final String jiraBaseUrl;
     private final UIFormatter uiFormatter;
@@ -32,6 +33,7 @@ public class QandAIssueAction extends AbstractIssueAction {
                             final User currentUser,
                             final Question question,
                             final boolean canOverrideActions,
+                            final boolean canAddToIssueDescription,
                             final String jiraBaseUrl,
                             final UIFormatter uiFormatter) {
         super(descriptor);
@@ -39,6 +41,7 @@ public class QandAIssueAction extends AbstractIssueAction {
         this.question = question;
         this.currentUser = currentUser;
         this.canOverrideActions = canOverrideActions;
+        this.canAddToIssueDescription = canAddToIssueDescription;
         this.jiraBaseUrl = jiraBaseUrl;
         this.uiFormatter = uiFormatter;
     }
@@ -52,6 +55,7 @@ public class QandAIssueAction extends AbstractIssueAction {
     @SuppressWarnings("unchecked")
     protected void populateVelocityParams(Map map) {
         map.put("overrideActions", canOverrideActions);
+        map.put("addToIssueDescription", canAddToIssueDescription);
         map.put("currentUser", currentUser);
         map.put("baseJIRAURL", jiraBaseUrl);
         map.put("issue", issue);

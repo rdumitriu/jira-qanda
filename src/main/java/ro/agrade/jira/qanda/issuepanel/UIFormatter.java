@@ -7,9 +7,8 @@ import java.text.*;
 import java.util.*;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.avatar.Avatar.Size;
-import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
@@ -33,15 +32,18 @@ public class UIFormatter {
     private final String baseURL;
     private final RendererManager rendererMgr;
     private final IssueRenderContext renderContext;
+    private final AvatarService avatarService;
     private static final String STDFORMAT = "yyyy-MM-dd HH:mm";
 
     public UIFormatter(final UserManager userManager,
                        final JiraAuthenticationContext authContext,
+                       final AvatarService avatarService,
                        final ApplicationProperties properties,
                        final RendererManager rendererMgr,
                        final Issue issue) {
         this.userManager = userManager;
         this.authContext = authContext;
+        this.avatarService = avatarService;
         this.baseURL = properties.getString("jira.baseurl");
         this.rendererMgr = rendererMgr;
         this.renderContext = new IssueRenderContext(issue);
@@ -72,7 +74,7 @@ public class UIFormatter {
         String avatarUrl = null;
         try {
             userObj = userManager.getUserObject(user);
-            avatarUrl = ComponentAccessor.getAvatarService().getAvatarUrlNoPermCheck(user, Size.SMALL).toString();
+            avatarUrl = avatarService.getAvatarUrlNoPermCheck(user, Size.SMALL).toString();
         } catch(Throwable t) { /* we do not care */ }
         if(null == userObj) {
             return user; // unknown, deleted

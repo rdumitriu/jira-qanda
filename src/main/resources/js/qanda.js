@@ -240,28 +240,28 @@ var QANDA = (function () {
 
 AJS.$(document).ready(function() {
     // the add button for questions
-    AJS.$('#quanda_addquestion').bind("click", function(e) {
+    AJS.$('#quanda_addquestion').live("click", function(e) {
         QANDA.askQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('issueKey'));
     });
 
-    AJS.$('a[id^="quanda_delquestion_"]').bind("click", function(e) {
+    AJS.$('a[id^="quanda_delquestion_"]').live("click", function(e) {
         QANDA.deleteQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
     });
 
 
-    AJS.$('a[id^="quanda_addanswer_"]').bind("click", function(e) {
+    AJS.$('a[id^="quanda_addanswer_"]').live("click", function(e) {
         QANDA.respondToQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
     });
 
-    AJS.$('a[id^="quanda_approvelink_"]').bind("click", function(e) {
+    AJS.$('a[id^="quanda_approvelink_"]').live("click", function(e) {
         QANDA.approveAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
     });
 
-    AJS.$('a[id^="quanda_disapprovelink_"]').bind("click", function(e) {
+    AJS.$('a[id^="quanda_disapprovelink_"]').live("click", function(e) {
         QANDA.clearApprovalAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
     });
 
-    AJS.$('a[id^="quanda_deleteanswer_"]').bind("click", function(e) {
+    AJS.$('a[id^="quanda_deleteanswer_"]').live("click", function(e) {
         QANDA.deleteAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
     });
     

@@ -1,7 +1,7 @@
 package ro.agrade.jira.qanda.issuepanel;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.bc.project.component.ProjectComponent;
+import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
@@ -9,7 +9,6 @@ import com.atlassian.jira.plugin.issuetabpanel.AbstractIssueTabPanel;
 import com.atlassian.jira.plugin.issuetabpanel.IssueAction;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import ro.agrade.jira.qanda.QandAService;
@@ -30,6 +29,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
     private final UserManager userManager;
     private final QandAService service;
     private final RendererManager rendererMgr;
+    private final AvatarService avatarService;
 
     public QandAIssuePanel(final WebResourceManager webResourceManager,
                            final ApplicationProperties properties,
@@ -37,7 +37,8 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
                            final PermissionManager permissionManager,
                            final JiraAuthenticationContext authContext,
                            final QandAService service,
-                           final RendererManager rendererMgr) {
+                           final RendererManager rendererMgr,
+                           final AvatarService avatarService) {
         this.webResourceManager = webResourceManager;
         this.properties = properties;
         this.userManager = userManager;
@@ -45,6 +46,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         this.authContext = authContext;
         this.service = service;
         this.rendererMgr = rendererMgr;
+        this.avatarService = avatarService;
     }
 
     private String getText(String key) {
@@ -58,7 +60,8 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
         User currentUser = authContext.getLoggedInUser();
         boolean canOverrideActions = PermissionChecker.isUserLeadOrAdmin(permissionManager, issue, currentUser);
-        UIFormatter formatter = new UIFormatter(userManager, authContext, properties, rendererMgr, issue);
+        boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, user);
+        UIFormatter formatter = new UIFormatter(userManager, authContext, avatarService, properties, rendererMgr, issue);
         String baseURL = properties.getString("jira.baseurl");
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
@@ -66,7 +69,8 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         
         // add first action with null Q to add title and add Q button
         actions.add(new QandAIssueAction(descriptor, issue, currentUser, null,
-                                         canOverrideActions, baseURL, formatter));
+                                         canOverrideActions, canAddToIssue,
+                                         baseURL, formatter));
         
         if(questions == null || questions.size() == 0){
         	return actions;
@@ -74,7 +78,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         // for each Q add a new action
         for(Question q : questions) {
             actions.add(new QandAIssueAction(descriptor, issue, currentUser,  q,
-                                             canOverrideActions, baseURL, formatter));
+                                             canOverrideActions, canOverrideActions, baseURL, formatter));
         }
         return actions;
     }
