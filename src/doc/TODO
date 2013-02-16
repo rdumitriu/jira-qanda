@@ -1,17 +1,11 @@
-MUST DO:
-Technical stuff:
-c) UI changes:
-    c.1) FLORIN: Gadget styles & code
 
-1. If answer is approved:
-Add to description functionality (if question is clarified)
-
-2. Edit:
-Impr: if we do not have an answer, we should be able to edit the question
-Impr: if the answer is not approved, we should be able to edit the answer
-
-3. FLORIN: Localization of qanda.js, gadget, etc
 
 FUTURE:
-1. Add to comments functionality
+1. Add to comments functionality (needed?)
 2. Mails (one per day)
+3. Save modifier too ... and the TS of the modify operation (skipped for now)
+same for approver on question ...
+4. Performance impr
+    4.1. Search for questions directly (not though issues - not sure about this...)
+    4.2. Get rid of some reloads (both in business layer and in the UI)
+5. With any question and answer, update the issue 'updated' field.

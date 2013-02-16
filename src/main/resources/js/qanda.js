@@ -101,11 +101,11 @@ var QANDA = (function () {
         });
     }
 
-    function createRespondPanelContent() {
+    function createRespondPanelContent(atext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">Your answer:</label>';
-                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaanswertext" name="qandaanswertext" title="Answer"></textarea>';
+                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaanswertext" name="qandaanswertext" title="Answer">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -121,7 +121,7 @@ var QANDA = (function () {
             closeOnOutsideClick: false
         });
         dialog.addHeader("Respond");
-        dialog.addPanel("Panel1", createRespondPanelContent(), "panel-body");
+        dialog.addPanel("Panel1", createRespondPanelContent(''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
         dialog.addButton("Respond ...", function() {
@@ -320,6 +320,74 @@ var QANDA = (function () {
     	}
     }
 
+    function editAnswer(base, aid) {
+        console.log("getting answer: " + aid);
+        AJS.$.ajax ({
+            type: 'POST',
+            url: base + "/rest/agrade/qanda/latest/panel/answertext",
+            data: {
+                answerId : aid,
+            },
+            dataType: 'text',
+            success: function(data) {
+                console.log("edit answer: success :" + data);
+                var dialog = new AJS.Dialog({
+                            width:500,
+                            height:200,
+                            id:"quanda-addanswer",
+                            closeOnOutsideClick: false
+                        });
+                dialog.addHeader("Edit answer");
+                dialog.addPanel("Panel1", createRespondPanelContent(data), "panel-body");
+                dialog.get("panel:0").setPadding(10);
+
+                dialog.addButton("Update answer ...", function() {
+                    var txt = AJS.$('#qandaanswertext').val();
+                    if(txt.length > 0) {
+                        console.log("saving answer " + aid + " base: " + base);
+                        saveAnswer(base, aid, txt);
+                        dialog.hide();
+                        dialog.remove();
+                    }
+                }, "aui-button");
+
+                dialog.addCancel("Forget it", function() {
+                    dialog.hide();
+                    dialog.remove();
+                });
+
+                dialog.show();
+                dialog.updateHeight();
+            }
+        });
+    }
+
+    function saveAnswer(base, aid, atext) {
+        AJS.$.ajax ({
+            type: 'POST',
+            url: base + "/rest/agrade/qanda/latest/panel/editanswer",
+            data: {
+                answerId : aid,
+                answer : atext,
+            },
+            success: function(data){
+                if(data){
+                    console.log("added answer: success");
+                    //reset the fields
+                }
+                reloadWindow();
+            },
+            error: function() {
+                AJS.$('#quanda-error').empty();
+                AJS.messages.error("#quanda-error", {
+                    title:"There was an error saving your answer ...",
+                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                });
+                AJS.$('#quanda-error').removeClass('hidden');
+            }
+        });
+    }
+
     return {
         askQuestion: askQuestion,
         editQuestion: editQuestion,
@@ -329,7 +397,7 @@ var QANDA = (function () {
         approveAnswer: approveAnswer,
         clearApprovalAnswer: clearApprovalAnswer,
         deleteAnswer : deleteAnswer,
-        
+        editAnswer : editAnswer,
         toggleAnswersBlock : toggleAnswersBlock
     }
 })();
@@ -365,6 +433,10 @@ AJS.$(document).ready(function() {
     AJS.$('a[id^="quanda_disapprovelink_"]').live("click", function(e) {
         QANDA.clearApprovalAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
     });
+
+    AJS.$('a[id^="quanda_editanswer_"]').live("click", function(e) {
+            QANDA.editAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+        });
 
     AJS.$('a[id^="quanda_deleteanswer_"]').live("click", function(e) {
         QANDA.deleteAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));

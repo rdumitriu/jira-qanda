@@ -87,6 +87,7 @@
                             #end
                         #end
                         #if(($currentUser.name == $a.user || $overrideActions) && $a.accepted == false)
+                            <a id="quanda_editanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editanswerlink")"></a>
                             <a id="quanda_deleteanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deleteanswerlink")"></a>
     					#end
 					</span>
