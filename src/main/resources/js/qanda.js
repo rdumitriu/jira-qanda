@@ -3,11 +3,11 @@
 
 var QANDA = (function () {
 
-    function createAskPanelContent() {
+    function createAskPanelContent(qtext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaquestiontext">Your question:</label>';
-                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaquestiontext" name="qandaquestiontext" title="Question"></textarea>';
+                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaquestiontext" name="qandaquestiontext" title="Question">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -23,7 +23,7 @@ var QANDA = (function () {
             closeOnOutsideClick: false
         });
         dialog.addHeader("Add Question");
-        dialog.addPanel("Panel1", createAskPanelContent(), "panel-body");
+        dialog.addPanel("Panel1", createAskPanelContent(''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
         dialog.addButton("Ask your question ...", function() {
@@ -73,6 +73,31 @@ var QANDA = (function () {
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
         	}
+        });
+    }
+
+    function addQuestionToIssue(base, qid) {
+        AJS.$.ajax ({
+            type: 'POST',
+            url: base + "/rest/agrade/qanda/latest/panel/addtoissue",
+            data: {
+                questionId : qid,
+            },
+            success: function(data){
+                if(data){
+                    console.log("added question to issue: success");
+                    //reset the fields
+                }
+                reloadWindow();
+            },
+            error: function() {
+                AJS.$('#quanda-error').empty();
+                AJS.messages.error("#quanda-error", {
+                    title:"There was an error posting your question in the issue description ...",
+                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                });
+                AJS.$('#quanda-error').removeClass('hidden');
+            }
         });
     }
 
@@ -162,6 +187,75 @@ var QANDA = (function () {
         });
     }
 
+    function editQuestion(base, qid) {
+        console.log("edit question: " + qid);
+
+        AJS.$.ajax ({
+            type: 'POST',
+            url: base + "/rest/agrade/qanda/latest/panel/questiontext",
+            data: {
+                questionId : qid,
+            },
+            dataType: 'text',
+            success: function(data) {
+                console.log("got text for question: success :" + data);
+                var dialog = new AJS.Dialog({
+                            width:500,
+                            height:200,
+                            id:"quanda-editquestion",
+                            closeOnOutsideClick: false
+                });
+                dialog.addHeader("Edit question");
+                dialog.addPanel("Panel1", createAskPanelContent(data), "panel-body");
+                dialog.get("panel:0").setPadding(10);
+
+                dialog.addButton("Update question ...", function() {
+                    var txt = AJS.$('#qandaquestiontext').val();
+                    if(txt.length > 0) {
+                        console.log("saving question" + qid + " base: " + base);
+                        saveQuestion(base, qid, txt);
+                        dialog.hide();
+                        dialog.remove();
+                    }
+                }, "aui-button");
+
+                dialog.addCancel("Forget it", function() {
+                    dialog.hide();
+                    dialog.remove();
+                });
+
+                dialog.show();
+                dialog.updateHeight();
+            }
+        });
+    }
+
+    function saveQuestion(base, qid, qtext) {
+        AJS.$.ajax ({
+            type: 'POST',
+            url: base + "/rest/agrade/qanda/latest/panel/editquestion",
+            data: {
+                questionId : qid,
+                question : qtext,
+            },
+            success: function(data){
+                if(data){
+                    console.log("modified question: success");
+                    //reset the fields
+                }
+                reloadWindow();
+            },
+            error: function() {
+                AJS.$('#quanda-error').empty();
+                AJS.messages.error("#quanda-error", {
+                    title:"There was an error saving your question ...",
+                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                });
+                AJS.$('#quanda-error').removeClass('hidden');
+            }
+        });
+    }
+
     function toggleAnswerFlag(base, aid, flag) {
         AJS.$.ajax ({
             type: 'POST',
@@ -228,7 +322,9 @@ var QANDA = (function () {
 
     return {
         askQuestion: askQuestion,
+        editQuestion: editQuestion,
         deleteQuestion: deleteQuestion,
+        addQuestionToIssue: addQuestionToIssue,
         respondToQuestion: respondToQuestion,
         approveAnswer: approveAnswer,
         clearApprovalAnswer: clearApprovalAnswer,
@@ -247,6 +343,15 @@ AJS.$(document).ready(function() {
     AJS.$('a[id^="quanda_delquestion_"]').live("click", function(e) {
         QANDA.deleteQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
     });
+
+    AJS.$('a[id^="quanda_editquestion_"]').live("click", function(e) {
+        QANDA.editQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+    });
+
+    AJS.$('a[id^="quanda_adddescquestion_"]').live("click", function(e) {
+        QANDA.addQuestionToIssue(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+    });
+
 
 
     AJS.$('a[id^="quanda_addanswer_"]').live("click", function(e) {

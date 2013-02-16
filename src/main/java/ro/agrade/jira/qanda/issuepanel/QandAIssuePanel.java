@@ -78,7 +78,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         // for each Q add a new action
         for(Question q : questions) {
             actions.add(new QandAIssueAction(descriptor, issue, currentUser,  q,
-                                             canOverrideActions, canOverrideActions, baseURL, formatter));
+                                             canOverrideActions, canAddToIssue, baseURL, formatter));
         }
         return actions;
     }
