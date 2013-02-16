@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-    <ModulePrefs title="Unresolved Questions"
-                 directory_title="Unresolved questions"
-                 description="Shows unresolved questions on a project"
-                 author="Radu Dumitriu"
-                 author_affiliation="AGRADE"
-                 author_location="Bucharest, Romania" height="100"
+    <ModulePrefs title="__MSG_qanda.gadget.title__"
+                 directory_title="__MSG_qanda.gadget.directory.title__"
+                 description="__MSG_qanda.gadget.description__"
+                 author="__MSG_qanda.gadget.author__"
+                 author_affiliation="__MSG_qanda.gadget.author.affiliation__"
+                 author_location="__MSG_qanda.gadget.author.location__" 
+                 height="100"
                  >
         <Optional feature="gadget-directory">
             <Param name="categories">

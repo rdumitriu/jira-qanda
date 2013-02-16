@@ -8,12 +8,18 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.avatar.AvatarService;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.*;
+import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.JiraDateUtils;
 
 import ro.agrade.jira.qanda.*;
+import ro.agrade.jira.qanda.issuepanel.UIFormatter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,17 +39,26 @@ public class GadgetRestService {
     private final IssueManager issueManager;
     private final JiraAuthenticationContext authContext;
     private final PermissionManager permMgr;
+	private final ApplicationProperties properties;
+	private final AvatarService avatarService;
+	private final UserManager userManager;
 
     public GadgetRestService(final QandAService service,
                              final RendererManager rendererMgr,
                              final IssueManager issueManager,
                              final JiraAuthenticationContext authContext,
-                             final PermissionManager permMgr) {
+                             final PermissionManager permMgr,
+                             final ApplicationProperties appProps,
+                             final AvatarService avatarServ,
+                             final UserManager userMgr) {
         this.service = service;
         this.rendererMgr = rendererMgr;
         this.issueManager = issueManager;
         this.authContext = authContext;
         this.permMgr = permMgr;
+		this.properties = appProps;
+		this.avatarService = avatarServ;
+		this.userManager = userMgr;
     }
 
     /**
@@ -152,8 +167,16 @@ public class GadgetRestService {
         for(Question q : questions) {
             Issue issue = issueManager.getIssueObject(q.getIssueId());
             String qtext = formatQuestionText(issue, q);
-            ret.add(new GadgetQuestion(issue.getKey(), issue.getSummary(),
-                                       qtext, q.getStatus().name(), q.isAnswered()));
+            UIFormatter formatter = new UIFormatter(userManager, authContext, avatarService, properties, rendererMgr, issue);
+            ret.add(new GadgetQuestion(q.getId(), 
+            						   q.getAnswers() != null ? q.getAnswers().size() : 0,
+            						   issue.getKey(), 
+            						   issue.getSummary(),
+                                       qtext, 
+                                       q.getStatus().name(), 
+                                       formatter.formatUser(q.getUser()),
+                                       q.isAnswered(),
+                                       formatter.formatTimeStamp(q.getTimeStamp())));
         }
         return ret;
     }

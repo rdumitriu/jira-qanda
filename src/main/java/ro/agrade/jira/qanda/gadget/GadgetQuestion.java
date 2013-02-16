@@ -16,11 +16,15 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class GadgetQuestion {
+	public long id;
+	public int noAnswers;
     public String issueKey;
     public String issueSummary;
     public String questionText;
     public String status;
+    public String user;
     public boolean answered;
+	public String timestamp;
 
     /**
      * Default constructor
@@ -36,13 +40,22 @@ public class GadgetQuestion {
      * @param status
      * @param answered
      */
-    public GadgetQuestion(String issueKey, String issueSummary,
+    public GadgetQuestion(long id, int noAnswers, 
+    					  String issueKey, String issueSummary,
                           String questionText,
-                          String status, boolean answered) {
+                          String status,
+                          String user,
+                          boolean answered,
+                          String timestamp) {
+    	this.id = id;
+    	this.noAnswers = noAnswers;
         this.issueKey = issueKey;
         this.issueSummary = issueSummary;
         this.questionText = questionText;
         this.status = status;
+        this.user = user;
         this.answered = answered;
+        this.timestamp = timestamp;
     }
+    
 }

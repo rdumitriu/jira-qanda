@@ -32,6 +32,12 @@
 	font-weight: bold;
 }
 
+.qandauser .user-hover.user-avatar {
+	background-repeat: no-repeat;
+	background-position: center left;
+	padding: 2px 0 2px 19px;
+}
+
 .qanda-question-thread {
 	background-color: white;
 	padding: 10px;
@@ -115,3 +121,24 @@
 .qanda-accepted-answer {
 	background-color: #ebffe6;
 }
+
+
+
+/*=====================================*/
+/*==========  G A D G E T  ============*/
+/*=====================================*/
+
+.qanda-gadget-view {
+	padding-left : 10px;
+	padding-right : 10px;
+}
+
+.qanda-gadget-panel .issue-link {
+	font-weight: bolder;
+}
+
+.qanda-gadget-panel .user-content-block {
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+

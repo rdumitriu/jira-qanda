@@ -35,10 +35,12 @@ var QANDAGADGET = (function() {
     function getTemplate(gadget, args, baseUrl) {
         // reset view
         gadget.getView().empty();
-
+        gadget.getView().append("<div class='qanda-gadget-view'></div>");
+        var content = gadget.getView().find(".qanda-gadget-view");
+        
         if(gadget.getPref("project") == "") {
-             var html = "<div class='aui-message aui-message-info'>Please configure me first!</div>";
-             gadget.getView().append(html);
+             var html = "<br/><div class='aui-message aui-message-info'>"+ gadget.getMsg("qanda.gadget.not.configured")+"</div>";
+             content.append(html);
              return;
         }
 
@@ -56,18 +58,18 @@ var QANDAGADGET = (function() {
                     console.log("rendering questions: success");
                     //reset the fields
                     for(var i = 0; i < data.length; i++) {
-                        gadget.getView().append(formatQuestion(gadget, data[i]));
+                        content.append(formatQuestion(gadget, data[i]));
                     }
                 } else {
-                    var html = "<div class='aui-message aui-message-info'>No questions asked, everything seems to be cristal clear</div>";
-                    gadget.getView().append(html);
+                    var html = "<br/><div class='aui-message aui-message-info'>"+gadget.getMsg("qanda.gadget.no.questions")+"</div>";
+                    content.append(html);
                 }
                 gadget.resize();
             },
             error: function() {
                 gadget.hideLoading();
-                var html = "<div class='aui-message aui-message-error'> Error! Please check the log for details ...</div>";
-                gadget.getView().append(html);
+                var html = "<br/><div class='aui-message aui-message-error'>" + gadget.getMsg("qanda.gadget.generic.error") + "</div>";
+                content.append(html);
                 gadget.resize();
             }
         });
@@ -76,25 +78,25 @@ var QANDAGADGET = (function() {
     
     function formatQuestion(gadget, q){
         var html = "";
-        // public String issueKey;
-        // public String issueSummary;
-        // public String questionText;
-        // public String status;
-        // public boolean answered;\
         
-        html += "<div class='qanda-panel-item qanda-question-panel qanda-gadget-panel'>";
-        html += "<a href='" + contextPath + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + "</a> " + q.issueSummary;
-        
-        // TODO ## ============= HEADER
-        // <span class='qandauser'>$uiFormatter.formatUser($question.user) $i18n.getText("qanda.panel.asked") </span>
-        // <span class='qandadateq'>&nbsp;-&nbsp;$uiFormatter.formatTimeStamp($question.timeStamp)</span>
+        html += "<div class='qanda-panel-item qanda-gadget-panel'>";
+        html += "<span class='qandauser'>" + q.user + "&nbsp;" + gadget.getMsg("qanda.panel.asked.for.issue") + "&nbsp;</span>";
+        html += "<a class='issue-link' href='" + contextPath + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + " - " + q.issueSummary + "</a>";
                      
         if(q.answered) {
-            html += "<span class='aui-lozenge aui-lozenge aui-lozenge-complete'>" + gadget.getMsg("qanda.status.answered") +"</span>";
+        	html += "<span class='aui-lozenge aui-lozenge aui-lozenge-complete'>" + q.noAnswers + "&nbsp;";
+        	if(q.noAnswers == 1) {
+        		html += gadget.getMsg("qanda.status.answers.singular"); 
+        	} else {
+        		html += gadget.getMsg("qanda.status.answers.plural");
+        	}
+        	html += "</span>";        		
+        	
         } else if(q.status == "OPEN") {
             html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-error'>" + gadget.getMsg("qanda.status.noanswer") +"</span>";
         }
         html += "<div class='user-content-block'>"+ q.questionText +"</div>"
+        html += "<div class='qandadateq'>"+ q.timestamp +"</span>";
         html += "</div>";                     
 
         return html;
