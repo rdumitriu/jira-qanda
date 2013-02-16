@@ -7,7 +7,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaquestiontext">Your question:</label>';
-                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaquestiontext" name="qandaquestiontext" title="Question">' + qtext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext" title="Question">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -17,7 +17,7 @@ var QANDA = (function () {
         console.log("adding question");
 
         var dialog = new AJS.Dialog({
-            width:500,
+            width:600,
             height:200,
             id:"quanda-addquestion",
             closeOnOutsideClick: false
@@ -105,7 +105,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">Your answer:</label>';
-                html += '<textarea cols="30" rows="4" class="textarea" type="text" id="qandaanswertext" name="qandaanswertext" title="Answer">' + atext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext" title="Answer">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -115,7 +115,7 @@ var QANDA = (function () {
         console.log("answering question: " + qid);
 
         var dialog = new AJS.Dialog({
-            width:500,
+            width:600,
             height:200,
             id:"quanda-addanswer",
             closeOnOutsideClick: false
@@ -200,7 +200,7 @@ var QANDA = (function () {
             success: function(data) {
                 console.log("got text for question: success :" + data);
                 var dialog = new AJS.Dialog({
-                            width:500,
+                            width:600,
                             height:200,
                             id:"quanda-editquestion",
                             closeOnOutsideClick: false
@@ -332,7 +332,7 @@ var QANDA = (function () {
             success: function(data) {
                 console.log("edit answer: success :" + data);
                 var dialog = new AJS.Dialog({
-                            width:500,
+                            width:600,
                             height:200,
                             id:"quanda-addanswer",
                             closeOnOutsideClick: false

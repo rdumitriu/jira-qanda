@@ -474,16 +474,18 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     }
 
     private String calculateText(Question q) {
+        //::TODO:: what if the answer / question already contain a panel
+        //well, for now, this is a known bug :)
         StringBuilder sb = new StringBuilder();
-        sb.append("\n{quote}Q:")
+        sb.append("{panel:title=Q&A|borderStyle=dashed|borderColor=#999|titleBGColor=#326ca6|bgColor=#FFFFFF}\n(?) ")
           .append(q.getQuestionText())
           .append("\n");
         for(Answer a : q.getAnswers()) {
             if(a.isAccepted()) {
-                sb.append("A:").append(a.getAnswerText()).append("\n");
+                sb.append("(on) ").append(a.getAnswerText()).append("\n");
             }
         }
-        sb.append("{quote}\n");
+        sb.append("{panel}\n");
         return sb.toString();
     }
 }
