@@ -48,30 +48,16 @@ var QANDAGADGET = (function() {
             url: baseUrl + "/rest/agrade/qanda/latest/gadget/getquestions",
             data: {
                 project: gadget.getPref("project"),
-                interval: gadget.getPref("issinterval"),
+                interval: gadget.getPref("issinterval")
             },
             success: function(data){
                 gadget.hideLoading();
                 if(data && data.length > 0){
                     console.log("rendering questions: success");
                     //reset the fields
-                    var html = "<table class='aui' border='0'>";
                     for(var i = 0; i < data.length; i++) {
-                        html += "<tr>";
-                        html += "<td><a href='" + baseUrl + "/browse/" + data[i].issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + data[i].issueKey + "</a> " + data[i].issueSummary;
-                        html += "<div style='margin-left: 10px;'>";
-                        if(!data[i].answered) {
-                            html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-default'>No answer</span>";
-                        } else if(!data[i].closed) {
-                            html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-complete'>Answered</span>";
-                        }
-                        html += "</div>";
-                        html += "</td>";
-                        html += "<td>" + data[i].questionText + "</td>";
-                        html += "</tr>";
+                        gadget.getView().append(formatQuestion(gadget, data[i]));
                     }
-                    html += "</table>";
-                    gadget.getView().append(html);
                 } else {
                     var html = "<div class='aui-message aui-message-info'>No questions asked, everything seems to be cristal clear</div>";
                     gadget.getView().append(html);
@@ -86,6 +72,32 @@ var QANDAGADGET = (function() {
             }
         });
 
+    }
+    
+    function formatQuestion(gadget, q){
+        var html = "";
+        // public String issueKey;
+        // public String issueSummary;
+        // public String questionText;
+        // public String status;
+        // public boolean answered;\
+        
+        html += "<div class='qanda-panel-item qanda-question-panel qanda-gadget-panel'>";
+        html += "<a href='" + contextPath + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + "</a> " + q.issueSummary;
+        
+        // TODO ## ============= HEADER
+        // <span class='qandauser'>$uiFormatter.formatUser($question.user) $i18n.getText("qanda.panel.asked") </span>
+        // <span class='qandadateq'>&nbsp;-&nbsp;$uiFormatter.formatTimeStamp($question.timeStamp)</span>
+                     
+        if(q.answered) {
+            html += "<span class='aui-lozenge aui-lozenge aui-lozenge-complete'>" + gadget.getMsg("qanda.status.answered") +"</span>";
+        } else if(q.status == "OPEN") {
+            html += "<span class='aui-lozenge aui-lozenge-subtle aui-lozenge-error'>" + gadget.getMsg("qanda.status.noanswer") +"</span>";
+        }
+        html += "<div class='user-content-block'>"+ q.questionText +"</div>"
+        html += "</div>";                     
+
+        return html;
     }
 
 

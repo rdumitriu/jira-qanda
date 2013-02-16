@@ -9,7 +9,7 @@
 
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="qanda"/>
-    
+	
     <!-- add our web resources -->
     <web-resource key="qanda-resources" name="qanda Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>

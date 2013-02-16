@@ -21,7 +21,7 @@
         <Require feature="dynamic-height"/>
         <Require feature="oauthpopup" />
         #oauth
-        #supportedLocales("gadget.common")
+        #supportedLocales("gadget.common,qanda")
     </ModulePrefs>
     <UserPref name="isConfigured" datatype="hidden" default_value="true" />
     <UserPref name="project" datatype="hidden" />
