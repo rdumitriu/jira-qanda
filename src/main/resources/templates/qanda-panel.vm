@@ -40,11 +40,15 @@
 		            <span class="aui-lozenge aui-lozenge aui-lozenge-success">$i18n.getText("qanda.status.clarified")</span>
 		        #end
 		    #end
+		    <span class="actions-toolbar">
             #if(($currentUser.name == $question.user || $overrideActions) && $question.answers.size() == 0)
-            <span class="actions-toolbar">
+                <a id="quanda_editquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editquestionlink")"></a>
             	<a id="quanda_delquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deletequestionlink")"></a>
-            </span>
             #end
+            #if($question.closed && $addToIssueDescription)
+                <a id="quanda_adddescquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-add16" title="$i18n.getText("qanda.panel.addquestiontodesclink")"></a>
+            #end
+            </span>
             
             ## ============= Q BODY
 		    <div class="user-content-block qandaq">$uiFormatter.formatText($question.questionText)</div>
