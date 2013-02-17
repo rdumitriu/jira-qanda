@@ -1,11 +1,11 @@
 
-
 FUTURE:
 1. Add to comments functionality (needed?)
-2. Mails (one per day)
+2. Mails (one per day / week)
 3. Save modifier too ... and the TS of the modify operation (skipped for now)
 same for approver on question ...
 4. Performance impr
     4.1. Search for questions directly (not though issues - not sure about this...)
     4.2. Get rid of some reloads (both in business layer and in the UI)
+    4.3. Cache ? To waste more memory? ... hm.
 5. With any question and answer, update the issue 'updated' field.

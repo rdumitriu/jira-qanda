@@ -297,7 +297,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         if(a == null) {
             return;
         }
-        checkAnswerPermission(a, true);
+        checkAnswerPermission(a);
         aImpl.updateAnswer(aid, answer);
     }
 
@@ -312,7 +312,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         if(a == null) {
             return;
         }
-        checkAnswerPermission(a, true);
+        checkAnswerPermission(a);
         aImpl.removeAnswer(aid);
     }
 
@@ -334,7 +334,6 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             }
             return;
         }
-        checkAnswerPermission(a, false);
         Question q = qImpl.getQuestion(a.getQuestionId());
         if(q == null) {
             if(LOG.isDebugEnabled()) {
@@ -343,6 +342,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             //already deleted
             return;
         }
+        checkToggleAnswerPermission(q);
         if(!q.isClosed() && flg) {
             //if question is not closed already, close it.
             if(LOG.isDebugEnabled()) {
@@ -421,8 +421,8 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         }
     }
 
-    private void checkAnswerPermission(Answer a, boolean checkStatus) {
-        if(checkStatus && a.isAccepted()) {
+    private void checkAnswerPermission(Answer a) {
+        if(a.isAccepted()) {
             String msg = String.format("Cannot modify answer id %d (already accepted)", a.getAnswerId());
             LOG.error(msg);
             throw new QandAPermissionException(msg);
@@ -430,6 +430,15 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(a.getIssueId());
         if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), a.getUser())) {
             String msg = String.format("Permission violation while accessing answer %d", a.getAnswerId());
+            LOG.error(msg);
+            throw new QandAPermissionException(msg);
+        }
+    }
+
+    private void checkToggleAnswerPermission(Question q) {
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
+        if(!PermissionChecker.isUserOwner(permissionManager, issue,  getCurrentUserObject(), q.getUser())) {
+            String msg = String.format("Permission violation while toggle answer for question %d", q.getId());
             LOG.error(msg);
             throw new QandAPermissionException(msg);
         }
@@ -477,7 +486,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         //::TODO:: what if the answer / question already contain a panel
         //well, for now, this is a known bug :)
         StringBuilder sb = new StringBuilder();
-        sb.append("{panel:title=Q&A|borderStyle=dashed|borderColor=#999|titleBGColor=#326ca6|bgColor=#FFFFFF}\n(?) ")
+        sb.append("\n{panel:title=Q&A|borderStyle=dashed|borderColor=#999|titleBGColor=#326ca6|bgColor=#FFFFFF}\n(?) ")
           .append(q.getQuestionText())
           .append("\n");
         for(Answer a : q.getAnswers()) {

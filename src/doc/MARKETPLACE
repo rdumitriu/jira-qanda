@@ -1,0 +1,46 @@
+
+The text below is the plugin description on Atlassian Marketplace
+=================================================================
+
+Was ever your comment actually a question ? Was ever your question lost in
+the tons of email notifications from JIRA ? If yes, this plugin is for you.
+
+What it adds to your JIRA is a little bit of formalism when asking questions
+and when responding to them. If your team does Agile in an unknown field, you
+need this, trust me. If you have many questions like 'Do you want it blue
+or purple?' you will want it badly.
+
+How was this plugin born ? My use case.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Well, I have a SCRUM project: a chemistry one. We had to put molecules and
+mass-spectra on screen, manipulate them, search for similarities, isomers,
+deal with various chemistry problems, and so on.
+
+You can imagine that none from my team - including me - was ready to cope with
+so much chemistry information (both my parents are chemists, so I absolutely
+hated organic chemistry back in high-school!... not anymore the case, but that
+part is lost anyway ..).
+Anyway, in this project, I had the luck to deal with some world-class chemists.
+Apart from being nice human beings, they had almost an infinite patience
+explaining us some concepts. I opened our JIRA to them, so the teams can quickly
+communicate (BTW, the chemists absolutely LOVE JIRA!).
+
+However, it became soon obvious that commenting or altering the description of
+the issue is not enough. We needed some kind of formalism so we can keep track
+of our chemistry ignorance in the project.
+
+This is how this plugin was born.
+
+How it is used ?
+~~~~~~~~~~~~~~~~
+
+Once installed, it gives you an extra panel on your issues: the questions panel.
+People can use that panel to add questions related to the issue and receive
+answers. Once one or more answers are approved, questions can be added to the
+description of the issue by a simple click.
+
+To keep track of the unresolved questions, a gadget is provided. It looks for
+issues in the specified time interval - check the configuration - and shows you
+unresolved questions. Having it near your activity stream will point out very
+quickly what piece of info is missing to the developer.

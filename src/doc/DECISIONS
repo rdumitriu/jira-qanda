@@ -8,5 +8,5 @@ development time. Actually, we want something like automated recipients finds.
 
 2/ No modify besides delete. Delete can only be performed by the owner if no
 restrictions are applied (question is answered, answer is approved). This is to
-avoid discussions (like: "I didn't asked THAT ..."). This needs to be relaxed,
-though.
+avoid discussions (like: "I didn't asked THAT ..."). Exception: question has no
+answer, answer is not approved.
