@@ -109,27 +109,7 @@
                     </pluginDependencies-->
                     <instructions>
                         <Bundle-Activator>ro.agrade.jira.qanda.plugin.PluginBundleActivator</Bundle-Activator>
-                        <!-- Licensing dependencies ?! -->
-                        <!-- Private-Package>com.atlassian.upm.license.storage.lib.*</Private-Package>
-                        <DynamicImport-Package>
-                            com.atlassian.upm.api.license.entity,
-                            com.atlassian.upm.api.license,
-                            com.atlassian.upm.api.util,
-                            com.atlassian.upm.license.storage.plugin;version="${upm.license.compatibility.version}"
-                        </DynamicImport-Package -->
                     </instructions>
-                    <!-- bundledArtifacts>
-                        <bundledArtifact>
-                            <groupId>com.atlassian.upm</groupId>
-                            <artifactId>atlassian-universal-plugin-manager-plugin</artifactId>
-                            <version>${upm.license.compatibility.version}</version>
-                        </bundledArtifact>
-                        <bundledArtifact>
-                            <groupId>com.atlassian.upm</groupId>
-                            <artifactId>plugin-license-storage-plugin</artifactId>
-                            <version>${upm.license.compatibility.version}</version>
-                        </bundledArtifact>
-                    </bundledArtifacts -->
                 </configuration>
                 <executions>
                     <execution>
@@ -141,23 +121,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-storage-plugin</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                            <includeArtifactIds>plugin-license-storage-plugin</includeArtifactIds>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin -->
         </plugins>
     </build>
 

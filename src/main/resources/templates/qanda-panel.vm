@@ -101,3 +101,24 @@
 	</div>
 #end
 
+<form id="parameterContainer">
+  <fieldset class="hidden parameters">
+    <input type="hidden" title="qcancel" value="$i18n.getText('qanda.button.cancel')">
+    <input type="hidden" title="qask" value="$i18n.getText('qanda.button.save.question')">
+    <input type="hidden" title="qanswer" value="$i18n.getText('qanda.button.save.answer')">
+    <input type="hidden" title="qsave" value="$i18n.getText('qanda.button.save.edit')">
+    <input type="hidden" title="qaskTitle" value="$i18n.getText('qanda.dialog.addquestion.title')">
+    <input type="hidden" title="qaskLabel" value="$i18n.getText('qanda.dialog.addquestion.label')">
+    <input type="hidden" title="qanswerTitle" value="$i18n.getText('qanda.dialog.addanswer.title')">
+    <input type="hidden" title="qanswerLabel" value="$i18n.getText('qanda.dialog.addanswer.label')">
+    <input type="hidden" title="qEditQTitle" value="$i18n.getText('qanda.dialog.edit.question.title')">
+    <input type="hidden" title="qEditATitle" value="$i18n.getText('qanda.dialog.edit.answer.title')">
+
+	<input type="hidden" title="qerrorLog" value="$i18n.getText('qanda.dialog.error.check.logs')">
+    <input type="hidden" title="qerrorSaveQTitle" value="$i18n.getText('qanda.dialog.error.saving.question.title')">
+    <input type="hidden" title="qerrorSaveATitle" value="$i18n.getText('qanda.dialog.error.saving.answer.title')">
+    <input type="hidden" title="qerrorAddToIssue" value="$i18n.getText('There was an error posting your question in the issue description ...')">
+
+  </fieldset>
+</form>
+	

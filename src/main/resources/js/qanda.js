@@ -6,8 +6,8 @@ var QANDA = (function () {
     function createAskPanelContent(qtext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
-                html += '<label for="qandaquestiontext">Your question:</label>';
-                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext" title="Question">' + qtext + '</textarea>';
+                html += '<label for="qandaquestiontext">'+ AJS.params.qanswerLabel +'</label>';
+                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -22,11 +22,11 @@ var QANDA = (function () {
             id:"quanda-addquestion",
             closeOnOutsideClick: false
         });
-        dialog.addHeader("Add Question");
+        dialog.addHeader(AJS.params.qaskTitle);
         dialog.addPanel("Panel1", createAskPanelContent(''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
-        dialog.addButton("Ask your question ...", function() {
+        dialog.addButton(AJS.params.qask, function() {
             var txt = AJS.$('#qandaquestiontext').val();
             if(txt.length > 0) {
                 console.log("saving question on " + issueKey + " base: " + base);
@@ -36,7 +36,7 @@ var QANDA = (function () {
             }
         }, "aui-button");
 
-        dialog.addCancel("Forget it", function() {
+        dialog.addCancel(AJS.params.qcancel, function() {
             dialog.hide();
             dialog.remove();
         });
@@ -68,8 +68,8 @@ var QANDA = (function () {
         	error: function() {
         	    AJS.$('#quanda-error').empty();
         	    AJS.messages.error("#quanda-error", {
-        	        title:"There was an error saving your question ...",
-                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+        	        title: AJS.params.qerrorSaveQTitle ,
+                    body: AJS.params.qerrorLog
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
         	}
@@ -93,8 +93,8 @@ var QANDA = (function () {
             error: function() {
                 AJS.$('#quanda-error').empty();
                 AJS.messages.error("#quanda-error", {
-                    title:"There was an error posting your question in the issue description ...",
-                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                    title: AJS.params.qerrorAddToIssue,
+                    body: AJS.params.qerrorLog
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
             }
@@ -104,8 +104,8 @@ var QANDA = (function () {
     function createRespondPanelContent(atext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
-                html += '<label for="qandaanswertext">Your answer:</label>';
-                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext" title="Answer">' + atext + '</textarea>';
+                html += '<label for="qandaanswertext">'+ AJS.params.qanswerLabel +'</label>';
+                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -120,11 +120,11 @@ var QANDA = (function () {
             id:"quanda-addanswer",
             closeOnOutsideClick: false
         });
-        dialog.addHeader("Respond");
+        dialog.addHeader(AJS.params.qanswerTitle);
         dialog.addPanel("Panel1", createRespondPanelContent(''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
-        dialog.addButton("Respond ...", function() {
+        dialog.addButton(AJS.params.qanswer, function() {
             var txt = AJS.$('#qandaanswertext').val();
             if(txt.length > 0) {
                 console.log("saving answer on question " + qid + " base: " + base);
@@ -134,7 +134,7 @@ var QANDA = (function () {
             }
         }, "aui-button");
 
-        dialog.addCancel("Forget it", function() {
+        dialog.addCancel(AJS.params.qcancel, function() {
             dialog.hide();
             dialog.remove();
         });
@@ -161,8 +161,8 @@ var QANDA = (function () {
             error: function() {
                 AJS.$('#quanda-error').empty();
                 AJS.messages.error("#quanda-error", {
-                    title:"There was an error saving your answer ...",
-                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                    title: AJS.params.qerrorSaveATitle ,
+                    body: AJS.params.qerrorLog
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
             }
@@ -205,11 +205,11 @@ var QANDA = (function () {
                             id:"quanda-editquestion",
                             closeOnOutsideClick: false
                 });
-                dialog.addHeader("Edit question");
+                dialog.addHeader(AJS.params.qEditQTitle);
                 dialog.addPanel("Panel1", createAskPanelContent(data), "panel-body");
                 dialog.get("panel:0").setPadding(10);
 
-                dialog.addButton("Update question ...", function() {
+                dialog.addButton(AJS.params.qsave, function() {
                     var txt = AJS.$('#qandaquestiontext').val();
                     if(txt.length > 0) {
                         console.log("saving question" + qid + " base: " + base);
@@ -219,7 +219,7 @@ var QANDA = (function () {
                     }
                 }, "aui-button");
 
-                dialog.addCancel("Forget it", function() {
+                dialog.addCancel(AJS.params.qcancel, function() {
                     dialog.hide();
                     dialog.remove();
                 });
@@ -248,8 +248,8 @@ var QANDA = (function () {
             error: function() {
                 AJS.$('#quanda-error').empty();
                 AJS.messages.error("#quanda-error", {
-                    title:"There was an error saving your question ...",
-                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                    title: AJS.params.qerrorSaveQTitle,
+                    body: AJS.params.qerrorLog
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
             }
@@ -337,11 +337,11 @@ var QANDA = (function () {
                             id:"quanda-addanswer",
                             closeOnOutsideClick: false
                         });
-                dialog.addHeader("Edit answer");
+                dialog.addHeader(AJS.params.qEditATitle);
                 dialog.addPanel("Panel1", createRespondPanelContent(data), "panel-body");
                 dialog.get("panel:0").setPadding(10);
 
-                dialog.addButton("Update answer ...", function() {
+                dialog.addButton(AJS.params.qsave, function() {
                     var txt = AJS.$('#qandaanswertext').val();
                     if(txt.length > 0) {
                         console.log("saving answer " + aid + " base: " + base);
@@ -351,7 +351,7 @@ var QANDA = (function () {
                     }
                 }, "aui-button");
 
-                dialog.addCancel("Forget it", function() {
+                dialog.addCancel(AJS.params.qcancel, function() {
                     dialog.hide();
                     dialog.remove();
                 });
@@ -380,8 +380,8 @@ var QANDA = (function () {
             error: function() {
                 AJS.$('#quanda-error').empty();
                 AJS.messages.error("#quanda-error", {
-                    title:"There was an error saving your answer ...",
-                    body: "<p>Please check the log for details or report the problem to the developer</p>"
+                    title: AJS.params.qerrorSaveATitle,
+                    body: AJS.params.qerrorLog
                 });
                 AJS.$('#quanda-error').removeClass('hidden');
             }
