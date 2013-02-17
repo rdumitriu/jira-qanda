@@ -486,7 +486,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         //::TODO:: what if the answer / question already contain a panel
         //well, for now, this is a known bug :)
         StringBuilder sb = new StringBuilder();
-        sb.append("\n{panel:title=Q&A|borderStyle=dashed|borderColor=#999|titleBGColor=#326ca6|bgColor=#FFFFFF}\n(?) ")
+        sb.append("\n{panel:title=Q&A|borderStyle=dashed|borderColor=#999|titleColor=#FFFFFF|titleBGColor=#326ca6|bgColor=#FFFFFF}\n(?) ")
           .append(q.getQuestionText())
           .append("\n");
         for(Answer a : q.getAnswers()) {
