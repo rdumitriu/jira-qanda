@@ -28,7 +28,8 @@ public class PermissionChecker {
      */
     public static boolean
     canViewIssue(PermissionManager permissionManager, Issue issue, User user) {
-        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user) &&
+        return  user != null &&
+        		permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user) &&
                 permissionManager.hasPermission(Permissions.BROWSE, issue.getProjectObject(), user);
     }
 
@@ -41,6 +42,9 @@ public class PermissionChecker {
      */
     public static boolean
     isUserLeadOrAdmin(PermissionManager permissionManager, Issue issue, User user) {
+    	if(user == null) {
+    		return false;
+    	}
         if(permissionManager.hasPermission(Permissions.ADMINISTER, user) ||
                 permissionManager.hasPermission(Permissions.PROJECT_ADMIN, issue.getProjectObject(), user) ||
                 permissionManager.hasPermission(Permissions.SYSTEM_ADMIN, user)) {
