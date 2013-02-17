@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * The issue panel
  */
 public class QandAIssuePanel extends AbstractIssueTabPanel {
     private final WebResourceManager webResourceManager;

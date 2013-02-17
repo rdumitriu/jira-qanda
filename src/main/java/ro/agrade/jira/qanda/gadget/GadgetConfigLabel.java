@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * ::TODO:: documentation
+ * The configuration labels for the Atl style config panel
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0

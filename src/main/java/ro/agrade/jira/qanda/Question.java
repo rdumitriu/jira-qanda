@@ -73,14 +73,6 @@ public class Question {
     }
 
     /**
-     * Sets the question text
-     * @param questionText the question text
-     */
-    public void setQuestionText(String questionText) {
-        this.questionText = questionText;
-    }
-
-    /**
      * Gets the question text
      * @return the question text
      */
@@ -143,13 +135,5 @@ public class Question {
      */
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
-    }
-
-    /**
-     * Sets the status of the question
-     * @param status the new status
-     */
-    public void setStatus(QuestionStatus status) {
-        this.status = status;
     }
 }

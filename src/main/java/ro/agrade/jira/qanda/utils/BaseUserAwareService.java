@@ -27,14 +27,6 @@ public class BaseUserAwareService {
     }
 
     /**
-     * Gets the auth context, if you need it
-     * @return the auth context
-     */
-    public JiraAuthenticationContext getAuthContext() {
-        return authContext;
-    }
-
-    /**
      * Gets the current user
      *
      * @return the current user
