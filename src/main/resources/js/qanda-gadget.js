@@ -58,7 +58,7 @@ var QANDAGADGET = (function() {
                     console.log("rendering questions: success");
                     //reset the fields
                     for(var i = 0; i < data.length; i++) {
-                        content.append(formatQuestion(gadget, data[i]));
+                        content.append(formatQuestion(gadget, data[i], baseUrl));
                     }
                 } else {
                     var html = "<br/><div class='aui-message aui-message-info'>"+gadget.getMsg("qanda.gadget.no.questions")+"</div>";
@@ -76,12 +76,12 @@ var QANDAGADGET = (function() {
 
     }
     
-    function formatQuestion(gadget, q){
+    function formatQuestion(gadget, q, baseUrl){
         var html = "";
         
         html += "<div class='qanda-panel-item qanda-gadget-panel'>";
         html += "<span class='qandauser'>" + q.user + "&nbsp;" + gadget.getMsg("qanda.panel.asked.for.issue") + "&nbsp;</span>";
-        html += "<a class='issue-link' href='" + contextPath + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + " - " + q.issueSummary + "</a>";
+        html += "<a class='issue-link' href='" + baseUrl + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + " - " + q.issueSummary + "</a>";
                      
         if(q.answered) {
         	html += "<span class='aui-lozenge aui-lozenge aui-lozenge-complete'>" + q.noAnswers + "&nbsp;";
