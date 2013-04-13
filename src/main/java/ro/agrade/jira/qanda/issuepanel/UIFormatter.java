@@ -18,6 +18,8 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.JiraDateUtils;
 
+import ro.agrade.jira.qanda.utils.JIRAUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 /**
@@ -46,7 +48,7 @@ public class UIFormatter {
         this.userManager = userManager;
         this.authContext = authContext;
         this.avatarService = avatarService;
-        this.baseURL = properties.getString("jira.baseurl");
+        this.baseURL = JIRAUtils.getRelativeJIRAPath(properties);
         this.rendererMgr = rendererMgr;
         this.renderContext = new IssueRenderContext(issue);
     }

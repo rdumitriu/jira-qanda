@@ -13,6 +13,7 @@ import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import ro.agrade.jira.qanda.QandAService;
 import ro.agrade.jira.qanda.Question;
+import ro.agrade.jira.qanda.utils.JIRAUtils;
 import ro.agrade.jira.qanda.utils.PermissionChecker;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         boolean canOverrideActions = PermissionChecker.isUserLeadOrAdmin(permissionManager, issue, currentUser);
         boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, user);
         UIFormatter formatter = new UIFormatter(userManager, authContext, avatarService, properties, rendererMgr, issue);
-        String baseURL = properties.getString("jira.baseurl");
+        String baseURL = JIRAUtils.getRelativeJIRAPath(properties);
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         List<Question> questions = service.loadQuestionsForIssue(issue.getKey());
