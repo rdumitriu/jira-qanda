@@ -1,3 +1,5 @@
+#disable_html_escaping()
+
 #if(!$question)
 	<div class="qanda-preamble qanda-panel-item">
 	    

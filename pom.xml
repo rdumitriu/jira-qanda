@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.agrade.jira</groupId>
     <artifactId>qanda</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <organization>
         <name>AGRADE</name>
@@ -26,7 +26,7 @@
     </developers>
 
     <name>qanda</name>
-    <description>This is the ro.agrade.jira:qanda plugin for Atlassian JIRA.</description>
+    <description>The Questions and Answers plugin - free</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
