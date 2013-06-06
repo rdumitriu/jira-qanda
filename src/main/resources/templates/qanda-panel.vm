@@ -1,13 +1,17 @@
 #disable_html_escaping()
 
 #if(!$question)
+    <div id="qandaparameters" class="hidden"
+         baseUrl="$baseJIRAURL"
+         issueKey="$issue.key"
+         projectKey="$issue.project.name"></div>
 	<div class="qanda-preamble qanda-panel-item">
 	    
 	    <div id='qanda_addbutton' class="aui-toolbar" style="display: inline;">
 	        <div class="toolbar-split toolbar-split-right" style="margin-top: 10px;">
 	            <ul class="toolbar-group">
 	                <li class="toolbar-item">
-	                	<a id="quanda_addquestion" baseUrl="$baseJIRAURL" issueKey="$issue.key" class="toolbar-trigger">
+	                	<a id="quanda_addquestion" class="toolbar-trigger">
 	                		<span class="icon icon-add16"></span>
 	                		<span class='qandamenu'>$i18n.getText("qanda.panel.addquestionlink")</span>
 	                	</a>
@@ -44,11 +48,11 @@
 		    #end
 		    <span class="actions-toolbar">
             #if(($currentUser.name == $question.user || $overrideActions) && $question.answers.size() == 0)
-                <a id="quanda_editquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editquestionlink")"></a>
-            	<a id="quanda_delquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deletequestionlink")"></a>
+                <a id="quanda_editquestion_$question.id" questionId='$question.id' class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editquestionlink")"></a>
+            	<a id="quanda_delquestion_$question.id" questionId='$question.id' class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deletequestionlink")"></a>
             #end
             #if($question.closed && $addToIssueDescription)
-                <a id="quanda_adddescquestion_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-add16" title="$i18n.getText("qanda.panel.addquestiontodesclink")"></a>
+                <a id="quanda_adddescquestion_$question.id" questionId='$question.id' class="toolbar-action icon icon-add16" title="$i18n.getText("qanda.panel.addquestiontodesclink")"></a>
             #end
             </span>
             
@@ -59,7 +63,7 @@
 		    <div class="aui-toolbar" style="padding-top: 0px;">
 		        <div class="toolbar-split toolbar-split-left" style="margin-left: 0px;">
 		            <ul class="toolbar-group">
-		                <li class="toolbar-item"><a id="quanda_addanswer_$question.id" questionId='$question.id' baseUrl="$baseJIRAURL" class="toolbar-trigger"><span class='qandamenu'>$i18n.getText("qanda.panel.addanswerlink")</span></a></li>
+		                <li class="toolbar-item"><a id="quanda_addanswer_$question.id" questionId='$question.id' class="toolbar-trigger"><span class='qandamenu'>$i18n.getText("qanda.panel.addanswerlink")</span></a></li>
 		            </ul>
 		        </div>
 		    </div>
@@ -83,14 +87,14 @@
 					<span class="actions-toolbar">
                         #if($currentUser.name == $question.user || $overrideActions)
                             #if($a.accepted == false)
-                            	<a id="quanda_approvelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action qanda-icon qanda-icon-accept" title="$i18n.getText("qanda.panel.approvelink")"></a>
+                            	<a id="quanda_approvelink_$a.answerId" answerId='$a.answerId' class="toolbar-action qanda-icon qanda-icon-accept" title="$i18n.getText("qanda.panel.approvelink")"></a>
                             #else
-                            	<a id="quanda_disapprovelink_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action qanda-icon qanda-icon-reject" title="$i18n.getText("qanda.panel.clearapprovallink")"></a>
+                            	<a id="quanda_disapprovelink_$a.answerId" answerId='$a.answerId' class="toolbar-action qanda-icon qanda-icon-reject" title="$i18n.getText("qanda.panel.clearapprovallink")"></a>
                             #end
                         #end
                         #if(($currentUser.name == $a.user || $overrideActions) && $a.accepted == false)
-                            <a id="quanda_editanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editanswerlink")"></a>
-                            <a id="quanda_deleteanswer_$a.answerId" answerId='$a.answerId' baseUrl="$baseJIRAURL" class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deleteanswerlink")"></a>
+                            <a id="quanda_editanswer_$a.answerId" answerId='$a.answerId' class="toolbar-action icon icon-edit-sml" title="$i18n.getText("qanda.panel.editanswerlink")"></a>
+                            <a id="quanda_deleteanswer_$a.answerId" answerId='$a.answerId' class="toolbar-action icon icon-delete" title="$i18n.getText("qanda.panel.deleteanswerlink")"></a>
     					#end
 					</span>
 	                

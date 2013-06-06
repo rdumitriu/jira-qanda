@@ -3,18 +3,19 @@
 
 var QANDA = (function () {
 
-    function createAskPanelContent(qtext) {
+    function createAskPanelContent(issueKey, projectKey, qtext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
-                //data-issuekey="TEST-5" data-projectkey="TEST"
                 html += '<label for="qandaquestiontext">'+ AJS.params.qaskLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
+                html += 'style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
     }
 
-    function askQuestion(base, issueKey) {
+    function askQuestion(base, issueKey, projectKey) {
         console.log("adding question");
 
         var dialog = new AJS.Dialog({
@@ -24,7 +25,7 @@ var QANDA = (function () {
             closeOnOutsideClick: false
         });
         dialog.addHeader(AJS.params.qaskTitle);
-        dialog.addPanel("Panel1", createAskPanelContent(''), "panel-body");
+        dialog.addPanel("Panel1", createAskPanelContent(issueKey, projectKey, ''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
         dialog.addButton(AJS.params.qask, function() {
@@ -102,17 +103,19 @@ var QANDA = (function () {
         });
     }
 
-    function createRespondPanelContent(atext) {
+    function createRespondPanelContent(issueKey, projectKey, atext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">'+ AJS.params.qanswerLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
+                html += 'style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
     }
 
-    function respondToQuestion(base, qid) {
+    function respondToQuestion(base, issueKey, projectKey, qid) {
         console.log("answering question: " + qid);
 
         var dialog = new AJS.Dialog({
@@ -122,7 +125,7 @@ var QANDA = (function () {
             closeOnOutsideClick: false
         });
         dialog.addHeader(AJS.params.qanswerTitle);
-        dialog.addPanel("Panel1", createRespondPanelContent(''), "panel-body");
+        dialog.addPanel("Panel1", createRespondPanelContent(issueKey, projectKey, ''), "panel-body");
         dialog.get("panel:0").setPadding(10);
 
         dialog.addButton(AJS.params.qanswer, function() {
@@ -188,7 +191,7 @@ var QANDA = (function () {
         });
     }
 
-    function editQuestion(base, qid) {
+    function editQuestion(base, issueKey, projectKey, qid) {
         console.log("edit question: " + qid);
 
         AJS.$.ajax ({
@@ -207,7 +210,7 @@ var QANDA = (function () {
                             closeOnOutsideClick: false
                 });
                 dialog.addHeader(AJS.params.qEditQTitle);
-                dialog.addPanel("Panel1", createAskPanelContent(data), "panel-body");
+                dialog.addPanel("Panel1", createAskPanelContent(issueKey, projectKey, data), "panel-body");
                 dialog.get("panel:0").setPadding(10);
 
                 dialog.addButton(AJS.params.qsave, function() {
@@ -321,7 +324,7 @@ var QANDA = (function () {
     	}
     }
 
-    function editAnswer(base, aid) {
+    function editAnswer(base, issueKey, projectKey, aid) {
         console.log("getting answer: " + aid);
         AJS.$.ajax ({
             type: 'POST',
@@ -339,7 +342,7 @@ var QANDA = (function () {
                             closeOnOutsideClick: false
                         });
                 dialog.addHeader(AJS.params.qEditATitle);
-                dialog.addPanel("Panel1", createRespondPanelContent(data), "panel-body");
+                dialog.addPanel("Panel1", createRespondPanelContent(issueKey, projectKey, data), "panel-body");
                 dialog.get("panel:0").setPadding(10);
 
                 dialog.addButton(AJS.params.qsave, function() {
@@ -406,41 +409,56 @@ var QANDA = (function () {
 AJS.$(document).ready(function() {
     // the add button for questions
     AJS.$('#quanda_addquestion').live("click", function(e) {
-        QANDA.askQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('issueKey'));
+        QANDA.askQuestion(AJS.$('#qandaparameters').attr('baseUrl'),
+                          AJS.$('#qandaparameters').attr('issueKey'),
+                          AJS.$('#qandaparameters').attr('projectKey'));
     });
 
     AJS.$('a[id^="quanda_delquestion_"]').live("click", function(e) {
-        QANDA.deleteQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+        QANDA.deleteQuestion(AJS.$('#qandaparameters').attr('baseUrl'),
+                             AJS.$(this).attr('questionId'));
     });
 
     AJS.$('a[id^="quanda_editquestion_"]').live("click", function(e) {
-        QANDA.editQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+        QANDA.editQuestion(AJS.$('#qandaparameters').attr('baseUrl'),
+                           AJS.$('#qandaparameters').attr('issueKey'),
+                           AJS.$('#qandaparameters').attr('projectKey'),
+                           AJS.$(this).attr('questionId'));
     });
 
     AJS.$('a[id^="quanda_adddescquestion_"]').live("click", function(e) {
-        QANDA.addQuestionToIssue(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+        QANDA.addQuestionToIssue(AJS.$('#qandaparameters').attr('baseUrl'),
+                                 AJS.$(this).attr('questionId'));
     });
-
 
 
     AJS.$('a[id^="quanda_addanswer_"]').live("click", function(e) {
-        QANDA.respondToQuestion(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('questionId'));
+        QANDA.respondToQuestion(AJS.$('#qandaparameters').attr('baseUrl'),
+                                AJS.$('#qandaparameters').attr('issueKey'),
+                                AJS.$('#qandaparameters').attr('projectKey'),
+                                AJS.$(this).attr('questionId'));
     });
 
     AJS.$('a[id^="quanda_approvelink_"]').live("click", function(e) {
-        QANDA.approveAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+        QANDA.approveAnswer(AJS.$('#qandaparameters').attr('baseUrl'),
+                            AJS.$(this).attr('answerId'));
     });
 
     AJS.$('a[id^="quanda_disapprovelink_"]').live("click", function(e) {
-        QANDA.clearApprovalAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+        QANDA.clearApprovalAnswer(AJS.$('#qandaparameters').attr('baseUrl'),
+                                  AJS.$(this).attr('answerId'));
     });
 
     AJS.$('a[id^="quanda_editanswer_"]').live("click", function(e) {
-            QANDA.editAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+            QANDA.editAnswer(AJS.$('#qandaparameters').attr('baseUrl'),
+                             AJS.$('#qandaparameters').attr('issueKey'),
+                             AJS.$('#qandaparameters').attr('projectKey'),
+                             AJS.$(this).attr('answerId'));
         });
 
     AJS.$('a[id^="quanda_deleteanswer_"]').live("click", function(e) {
-        QANDA.deleteAnswer(AJS.$(this).attr('baseUrl'), AJS.$(this).attr('answerId'));
+        QANDA.deleteAnswer(AJS.$('#qandaparameters').attr('baseUrl'),
+                           AJS.$(this).attr('answerId'));
     });
     
     AJS.$('.qanda-question-panel .twixi-trigger').live("click", function(){
