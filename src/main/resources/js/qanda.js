@@ -6,6 +6,7 @@ var QANDA = (function () {
     function createAskPanelContent(qtext) {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
+                //data-issuekey="TEST-5" data-projectkey="TEST"
                 html += '<label for="qandaquestiontext">'+ AJS.params.qaskLabel +'</label>';
                 html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
