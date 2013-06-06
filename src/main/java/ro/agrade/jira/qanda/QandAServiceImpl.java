@@ -20,6 +20,7 @@ import com.atlassian.query.Query;
 
 import ro.agrade.jira.qanda.dao.AnswerDataService;
 import ro.agrade.jira.qanda.dao.QuestionDataService;
+import ro.agrade.jira.qanda.plugin.PluginStorage;
 import ro.agrade.jira.qanda.utils.BaseUserAwareService;
 import ro.agrade.jira.qanda.utils.PermissionChecker;
 
@@ -222,6 +223,8 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(issueKey);
         checkQuestionAddPermission(issue);
         qImpl.addQuestion(issue.getId(), question);
+
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_ADDED, getCurrentUserObject(), question, issueKey));
     }
 
     /**
@@ -237,7 +240,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             return;
         }
         checkQuestionPermission(q);
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
         qImpl.updateQuestion(qid, question);
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_MODIFIED, getCurrentUserObject(), question, issue.getKey()));
     }
 
     /**
@@ -252,7 +257,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             return;
         }
         checkQuestionPermission(q);
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
         qImpl.removeQuestion(qid);
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_DELETED, getCurrentUserObject(), q.getQuestionText(), issue.getKey()));
     }
 
     /**
@@ -283,6 +290,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         checkAnswerAddPermission(issue);
         aImpl.addAnswer(qid, issue.getId(), answer);
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_ADDED, getCurrentUserObject(), answer, issue.getKey()));
     }
 
     /**
@@ -298,7 +306,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             return;
         }
         checkAnswerPermission(a);
+        Issue issue = issueManager.getIssueObject(a.getIssueId());
         aImpl.updateAnswer(aid, answer);
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_MODIFIED, getCurrentUserObject(), answer, issue.getKey()));
     }
 
     /**
@@ -313,7 +323,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             return;
         }
         checkAnswerPermission(a);
+        Issue issue = issueManager.getIssueObject(a.getIssueId());
         aImpl.removeAnswer(aid);
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_DELETED, getCurrentUserObject(), a.getAnswerText(), issue.getKey()));
     }
 
     /**
@@ -343,12 +355,14 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             return;
         }
         checkToggleAnswerPermission(q);
+        Issue issue = issueManager.getIssueObject(q.getIssueId());
         if(!q.isClosed() && flg) {
             //if question is not closed already, close it.
             if(LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Setting question %d status to: CLOSED", q.getId()));
             }
             qImpl.setQuestionFlag(q.getId(), QuestionStatus.CLOSED);
+            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_SOLVED, getCurrentUserObject(), q.getQuestionText(), issue.getKey()));
         } else if(q.isClosed() && !flg && !isAnotherAnswerApprovedBut(q, a)) {
             // we need to verify the answers which are approved.
             //if question is not open already, close it.
@@ -356,6 +370,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                 LOG.debug(String.format("Setting back question %d status to: OPEN", q.getId()));
             }
             qImpl.setQuestionFlag(q.getId(), QuestionStatus.OPEN);
+            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_REOPENED, getCurrentUserObject(), q.getQuestionText(), issue.getKey()));
         }
     }
 
@@ -496,5 +511,11 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         }
         sb.append("{panel}\n");
         return sb.toString();
+    }
+
+    private void notifyQAInternal(QandAEvent qaEvent) {
+        for(QandAListener l : PluginStorage.getInstance().getConfiguredListeners()) {
+            l.onEvent(qaEvent);
+        }
     }
 }

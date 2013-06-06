@@ -31,4 +31,27 @@ public final class JIRAUtils {
                     ? (rawBase.charAt(rawBase.length() - 1) == '/' ? rawBase.substring(0, rawBase.length() - 1) : rawBase)
                     : "");
     }
+
+    /**
+     * The full JIRA path, excluding an eventual ending /
+     * @param props the application properties
+     * @return the path, full with host
+     */
+    public static String getFullJIRAPath(ApplicationProperties props) {
+        String ret = props.getString("jira.baseurl");
+        if(ret.endsWith("/")) {
+            ret = ret.substring(0, ret.length() - 1);
+        }
+        return ret;
+    }
+
+    /**
+     * Gets an issue full URI (or project)
+     * @param props the application properties
+     * @param issueKey the issue key
+     * @return the path, relative to the server
+     */
+    public static String getIssueJIRAPath(ApplicationProperties props, String issueKey) {
+        return getFullJIRAPath(props) + "/browse/" + issueKey;
+    }
 }

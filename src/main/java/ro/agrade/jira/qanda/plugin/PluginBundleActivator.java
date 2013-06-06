@@ -50,6 +50,7 @@ public class PluginBundleActivator implements BundleActivator {
      */
     public void start(BundleContext bundleContext) {
         registerAdditionalDbResources();
+        PluginStorage.getInstance().init();
     }
 
     /**
@@ -57,6 +58,7 @@ public class PluginBundleActivator implements BundleActivator {
      * @param bundleContext the context (OSGI)
      */
     public void stop(BundleContext bundleContext) {
+        PluginStorage.getInstance().cleanup();
     }
 
 

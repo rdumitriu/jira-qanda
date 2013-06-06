@@ -7,7 +7,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaquestiontext">'+ AJS.params.qaskLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea mentionable" style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -105,7 +105,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">'+ AJS.params.qanswerLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
+                html += '<textarea cols="60" rows="5" class="textarea mentionable" style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;

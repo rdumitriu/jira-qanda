@@ -1,69 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
-    <plugin-info>
-        <description>${project.description}</description>
-        <version>${project.version}</version>
-        <vendor name="${project.organization.name}" url="${project.organization.url}" />
-        <param name="plugin-icon">images/icon_question16.png</param>
-        <param name="plugin-logo">images/icon_question72.png</param>
-    </plugin-info>
-
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="qanda"/>
-	
-    <!-- add our web resources -->
-    <web-resource key="qanda-resources" name="qanda Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        
-        <resource type="download" name="qanda.css" location="/css/qanda.css"/>
-        <resource type="download" name="qanda.js" location="/js/qanda.js"/>
-        <resource type="download" name="images/" location="/images"/>
-
-        <context>atl.general</context>
-    </web-resource>
-
-    <web-resource key="qanda-gadget-resources" name="qanda Gadget Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-
-        <resource type="download" name="qanda.css" location="/css/qanda.css"/>
-        <resource type="download" name="qanda-gadget.js" location="/js/qanda-gadget.js"/>
-        <resource type="download" name="images/" location="/images"/>
-    </web-resource>
-
-    <issue-tabpanel key="qanda-tabpanel" name="Q and A"
-                    class="ro.agrade.jira.qanda.issuepanel.QandAIssuePanel">
-        <description>Show Questions and Answers tab.</description>
-
-        <label key="qanda.issue-tab.label" />
-
-        <resource type="velocity"
-                  name="view"
-                  location="templates/qanda-panel.vm"/>
-
-    </issue-tabpanel>
-
-    <rest key="ro.agrade.jira.qanda.rest"
-          path="/agrade/qanda"
-          version="1.0">
-        <description>REST in peace interface</description>
-    </rest>
-
-    <component key="qandadaoserviceansw" class="ro.agrade.jira.qanda.dao.AnswerDataServiceImpl" public="false">
-        <interface>ro.agrade.jira.qanda.dao.AnswerDataService</interface>
-    </component>
-
-    <component key="qandadaoservicequest" class="ro.agrade.jira.qanda.dao.QuestionDataServiceImpl" public="false">
-        <interface>ro.agrade.jira.qanda.dao.QuestionDataService</interface>
-    </component>
-
-    <component key="qandaservice" class="ro.agrade.jira.qanda.QandAServiceImpl" public="true">
-        <interface>ro.agrade.jira.qanda.QandAService</interface>
-    </component>
-
-    <gadget key="quanda-gadget" name="Question Stream" location="gadget/qanda.xml">
-        <param name="roles-required">browse</param>
-    </gadget>
-    
-    <!-- import from the product container -->
-    <!--component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" /-->
-    
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/icon_question16.png</param>
+    <param name="plugin-logo">images/icon_question72.png</param>
+    <param name="plugin-banner">images/banner.png</param>
+  </plugin-info>
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="qanda"/>
+  <!-- add our web resources -->
+  <web-resource key="qanda-resources" name="qanda Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="qanda.css" location="/css/qanda.css"/>
+    <resource type="download" name="qanda.js" location="/js/qanda.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>atl.general</context>
+  </web-resource>
+  <web-resource key="qanda-gadget-resources" name="qanda Gadget Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="qanda.css" location="/css/qanda.css"/>
+    <resource type="download" name="qanda-gadget.js" location="/js/qanda-gadget.js"/>
+    <resource type="download" name="images/" location="/images"/>
+  </web-resource>
+  <issue-tabpanel key="qanda-tabpanel" name="Q and A" class="ro.agrade.jira.qanda.issuepanel.QandAIssuePanel">
+    <description>Show Questions and Answers tab.</description>
+    <label key="qanda.issue-tab.label"/>
+    <resource type="velocity" name="view" location="templates/qanda-panel.vm"/>
+  </issue-tabpanel>
+  <rest key="ro.agrade.jira.qanda.rest" path="/agrade/qanda" version="1.0">
+    <description>REST in peace interface</description>
+  </rest>
+  <component key="qandadaoserviceansw" class="ro.agrade.jira.qanda.dao.AnswerDataServiceImpl" public="false">
+    <interface>ro.agrade.jira.qanda.dao.AnswerDataService</interface>
+  </component>
+  <component key="qandadaoservicequest" class="ro.agrade.jira.qanda.dao.QuestionDataServiceImpl" public="false">
+    <interface>ro.agrade.jira.qanda.dao.QuestionDataService</interface>
+  </component>
+  <component key="qandaservice" class="ro.agrade.jira.qanda.QandAServiceImpl" public="true">
+    <interface>ro.agrade.jira.qanda.QandAService</interface>
+  </component>
+  <gadget key="quanda-gadget" name="Question Stream" location="gadget/qanda.xml">
+    <param name="roles-required">browse</param>
+  </gadget>
+  <!-- import from the product container -->
+  <!--component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" /-->
+  <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
+  <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
+  <component-import key="txTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
+  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
+  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+  <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
 </atlassian-plugin>

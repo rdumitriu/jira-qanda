@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.agrade.jira</groupId>
     <artifactId>qanda</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <organization>
         <name>AGRADE</name>
@@ -42,6 +42,19 @@
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <version>2.4.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.templaterenderer</groupId>
+            <artifactId>atlassian-template-renderer-api</artifactId>
+            <version>1.0.5</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-core</artifactId>
@@ -101,12 +114,6 @@
                     <productDataVersion>${jira.data.version}</productDataVersion>
                     <compressResources>false</compressResources>
                     <useFastdevCli>false</useFastdevCli>
-                    <!--pluginDependencies>
-                        <pluginDependency>
-                            <groupId>libgrp</groupId>
-                            <artifactId>lib-name</artifactId>
-                        </pluginDependency>
-                    </pluginDependencies-->
                     <instructions>
                         <Bundle-Activator>ro.agrade.jira.qanda.plugin.PluginBundleActivator</Bundle-Activator>
                     </instructions>
@@ -132,7 +139,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
         <release.date>${maven.build.timestamp}</release.date>
-        <upm.license.compatibility.version>2.3</upm.license.compatibility.version>
+        <upm.license.compatibility.version>2.9.3</upm.license.compatibility.version>
         <sal.api.version>2.4.0</sal.api.version>
         <atlassian.templaterenderer.version>1.0.5</atlassian.templaterenderer.version>
     </properties>
