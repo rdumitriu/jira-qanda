@@ -1,7 +1,5 @@
 package ro.agrade.jira.qanda.plugin;
 
-import java.util.*;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.sal.api.message.I18nResolver;
 
@@ -32,11 +30,11 @@ public class PluginStorage {
      * Call it at init
      */
     public void init() {
+        runner = new AsyncRunner();
         listeners = new QandAListener[1];
         listeners[0] = new StandardListener(ComponentAccessor.getUserManager(),
                                             new EmailMessageHandler(ComponentAccessor.getMailServerManager(),
-                                                                    ComponentAccessor.getApplicationProperties(),
-                                                                    ComponentAccessor.getComponent(I18nResolver.class)));
+                                                                    ComponentAccessor.getApplicationProperties()));
     }
 
     /**

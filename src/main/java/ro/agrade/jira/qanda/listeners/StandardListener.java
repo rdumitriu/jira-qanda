@@ -11,6 +11,9 @@ import com.atlassian.jira.user.util.UserManager;
 import ro.agrade.jira.qanda.QandAEvent;
 import ro.agrade.jira.qanda.QandAListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The standard listener.
  *
@@ -18,6 +21,7 @@ import ro.agrade.jira.qanda.QandAListener;
  * @since 1.0
  */
 public class StandardListener implements QandAListener {
+    private static final Log LOG = LogFactory.getLog(StandardListener.class);
     private MessageHandler handler;
     private UserManager userManager;
 
@@ -33,6 +37,12 @@ public class StandardListener implements QandAListener {
      */
     @Override
     public void onEvent(QandAEvent qaEvent) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Received event %s (Issue %s, User %s)",
+                                    qaEvent.getType(),
+                                    qaEvent.getIssueKey(),
+                                    qaEvent.getUser() != null ? qaEvent.getUser().getDisplayName() : ""));
+        }
         Set<String> extractedUsers = extractUsers(qaEvent.getText());
         if(extractedUsers != null) {
             for(String s : extractedUsers) {
@@ -44,6 +54,9 @@ public class StandardListener implements QandAListener {
     private void handleNotify(String s, QandAEvent qaEvent) {
         User user = toUserObject(s);
         if(user != null) {
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Notify user %s on event %s", s, qaEvent.getType()));
+            }
             handler.handleMessage(user, qaEvent);
         }
     }
@@ -61,6 +74,9 @@ public class StandardListener implements QandAListener {
                 sb.append(text.charAt(i));
             }
             String userName = sb.toString();
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Detected username >>%s<<", userName));
+            }
             int originalLength = userName.length() + 3; // [~]
             userName = userName.trim(); //just to make sure there are no extra spaces
             if(!"".equals(userName)) {

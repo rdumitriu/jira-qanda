@@ -107,4 +107,14 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
             </beans:list>
         </beans:property>
     </beans:bean>
+
+    <beans:bean id="i18nResolver" lazy-init="true"
+                class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=i18nResolver)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.sal.api.message.I18nResolver</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

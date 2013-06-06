@@ -284,7 +284,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     public void addAnswer(long qid, String answer) {
         Question q = qImpl.getQuestion(qid);
         if(q == null) {
-            LOG.error("Question may be already deleted");
+            LOG.error(String.format("Question %d may be already deleted, qid"));
             return;
         }
         Issue issue = issueManager.getIssueObject(q.getIssueId());
@@ -337,12 +337,12 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     @Override
     public void setAnswerApprovalFlag(long aid, boolean flg) {
         if(LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Setting flag '%b' for answer id %d. Maybe deleted ?", flg, aid));
+            LOG.debug(String.format("Setting flag '%b' for answer id %d.", flg, aid));
         }
         Answer a = aImpl.setAnswerAcceptedFlag(aid, flg);
         if(a == null) {
             if(LOG.isDebugEnabled()) {
-                LOG.debug(String.format("There is no answer with id %d. Maybe deleted ?", aid));
+                LOG.debug(String.format("There is no answer with id %d. Maybe already deleted ?", aid));
             }
             return;
         }
