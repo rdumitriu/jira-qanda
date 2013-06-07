@@ -224,7 +224,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         checkQuestionAddPermission(issue);
         qImpl.addQuestion(issue.getId(), question);
 
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_ADDED, getCurrentUserObject(), question, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_ADDED,
+                                        getCurrentUserObject(),
+                                        null,
+                                        question, issue));
     }
 
     /**
@@ -242,7 +245,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         checkQuestionPermission(q, issue);
         qImpl.updateQuestion(qid, question);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_MODIFIED, getCurrentUserObject(), question, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_MODIFIED,
+                                        getCurrentUserObject(),
+                                        buildUserSet(q, null), question, issue));
     }
 
     /**
@@ -259,7 +264,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         checkQuestionPermission(q, issue);
         qImpl.removeQuestion(qid);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_DELETED, getCurrentUserObject(), q.getQuestionText(), issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_DELETED,
+                                        getCurrentUserObject(),
+                                        buildUserSet(q, null),
+                                        q.getQuestionText(), issue));
     }
 
     /**
@@ -290,7 +298,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         checkAnswerAddPermission(issue);
         aImpl.addAnswer(qid, issue.getId(), answer);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_ADDED, getCurrentUserObject(), q.getQuestionText(), answer, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_ADDED,
+                                        getCurrentUserObject(),
+                                        buildUserSet(q, null),
+                                        q.getQuestionText(), answer, issue));
     }
 
     /**
@@ -315,7 +326,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         checkAnswerPermission(a, issue);
 
         aImpl.updateAnswer(aid, answer);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_MODIFIED, getCurrentUserObject(), q.getQuestionText(), answer, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_MODIFIED,
+                                        getCurrentUserObject(),
+                                        buildUserSet(q, a),
+                                        q.getQuestionText(), answer, issue));
     }
 
     /**
@@ -338,7 +352,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         checkAnswerPermission(a, issue);
 
         aImpl.removeAnswer(aid);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_DELETED, getCurrentUserObject(), q.getQuestionText(), a.getAnswerText(), issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_DELETED,
+                                        getCurrentUserObject(),
+                                        buildUserSet(q, a),
+                                        q.getQuestionText(), a.getAnswerText(), issue));
     }
 
     /**
@@ -376,7 +393,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                 LOG.debug(String.format("Setting question %d status to: CLOSED", q.getId()));
             }
             qImpl.setQuestionFlag(q.getId(), QuestionStatus.CLOSED);
-            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_SOLVED, getCurrentUserObject(), q.getQuestionText(), issue));
+            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_SOLVED,
+                                            getCurrentUserObject(),
+                                            buildUserSet(q, a),
+                                            q.getQuestionText(), issue));
         } else if(q.isClosed() && !flg && !isAnotherAnswerApprovedBut(q, a)) {
             // we need to verify the answers which are approved.
             //if question is not open already, close it.
@@ -384,7 +404,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                 LOG.debug(String.format("Setting back question %d status to: OPEN", q.getId()));
             }
             qImpl.setQuestionFlag(q.getId(), QuestionStatus.OPEN);
-            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_REOPENED, getCurrentUserObject(), q.getQuestionText(), issue));
+            notifyQAInternal(new QandAEvent(QandAEvent.Type.QUESTION_REOPENED,
+                                            getCurrentUserObject(),
+                                            buildUserSet(q, a),
+                                            q.getQuestionText(), issue));
         }
     }
 
@@ -522,6 +545,17 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         }
         sb.append("{panel}\n");
         return sb.toString();
+    }
+
+    private Set<String> buildUserSet(Question q, Answer a) {
+        Set<String> users = new HashSet<String>();
+        if(q != null) {
+            users.add(q.getUser());
+        }
+        if(a != null) {
+            users.add(a.getUser());
+        }
+        return users;
     }
 
     private void notifyQAInternal(QandAEvent qaEvent) {

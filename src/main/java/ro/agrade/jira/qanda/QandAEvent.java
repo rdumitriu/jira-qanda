@@ -3,6 +3,8 @@
  */
 package ro.agrade.jira.qanda;
 
+import java.util.*;
+
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 
@@ -45,6 +47,11 @@ public class QandAEvent {
      * The user
      */
     private User user;
+
+    /**
+     * Additional users
+     */
+    private Set<String> additionalUsers;
     /**
      * The issue key
      */
@@ -54,24 +61,29 @@ public class QandAEvent {
      * Constructor
      * @param type the type of the event
      * @param currentUserObject the user
+     * @param additionalUsers the additional users
      * @param text the text
      * @param issue the issue key
      */
-    public QandAEvent(Type type, User currentUserObject, String text, Issue issue) {
-        this(type, currentUserObject, null, text, issue);
+    public QandAEvent(Type type, User currentUserObject, Set<String> additionalUsers,
+                      String text, Issue issue) {
+        this(type, currentUserObject, additionalUsers, null, text, issue);
     }
 
     /**
      * Constructor
      * @param type the type of the event
      * @param currentUserObject the user
+     * @param additionalUsers the additional users
      * @param preambleText the preamble text (question, if != null)
      * @param text the text
      * @param issue the issue key
      */
-    public QandAEvent(Type type, User currentUserObject, String preambleText, String text, Issue issue) {
+    public QandAEvent(Type type, User currentUserObject, Set<String> additionalUsers,
+                      String preambleText, String text, Issue issue) {
         this.type = type;
         this.user = currentUserObject;
+        this.additionalUsers = additionalUsers;
         this.preambleText = preambleText;
         this.text = text;
         this.issue = issue;
@@ -103,6 +115,13 @@ public class QandAEvent {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * @return the additional users
+     */
+    public Set<String> getAdditionalUsers() {
+        return additionalUsers;
     }
 
     /**

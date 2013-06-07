@@ -49,6 +49,10 @@ public class StandardListener implements QandAListener {
         Set<String> extractedUsers = new HashSet<String>();
         extractUsersFromText(qaEvent.getPreambleText(), extractedUsers);
         extractUsersFromText(qaEvent.getText(), extractedUsers);
+
+        if(qaEvent.getAdditionalUsers() != null) {
+            extractedUsers.addAll(qaEvent.getAdditionalUsers());
+        }
         //2: remove current user (or should I still send it?)
         if(qaEvent.getUser() != null) {
             extractedUsers.remove(qaEvent.getUser().getName());
