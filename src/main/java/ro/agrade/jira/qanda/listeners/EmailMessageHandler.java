@@ -101,6 +101,12 @@ public class EmailMessageHandler implements MessageHandler {
             sb.append("\n\n");
             sb.append(JIRAUtils.getIssueJIRAPath(props, qaEvent.getIssueKey() + "?page=ro.agrade.jira.qanda:qanda-tabpanel"));
             sb.append("\n\n");
+            if(qaEvent.getPreambleText() != null) {
+                sb.append(i18nResolver.getText("qanda.mail.question.preamble"));
+                sb.append("\n\n");
+                sb.append(qaEvent.getPreambleText());
+                sb.append("\n\n");
+            }
             sb.append(i18nResolver.getText("qanda.mail.firstline.1"));
             sb.append(" ");
             sb.append(qaEvent.getUser().getDisplayName());

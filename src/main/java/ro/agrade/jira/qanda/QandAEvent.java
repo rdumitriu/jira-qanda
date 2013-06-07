@@ -37,6 +37,11 @@ public class QandAEvent {
      */
     private String text;
     /**
+     * The secondary text (if it's an answer, this is the question)
+     */
+    private String preambleText;
+
+    /**
      * The user
      */
     private User user;
@@ -53,8 +58,21 @@ public class QandAEvent {
      * @param issue the issue key
      */
     public QandAEvent(Type type, User currentUserObject, String text, Issue issue) {
+        this(type, currentUserObject, null, text, issue);
+    }
+
+    /**
+     * Constructor
+     * @param type the type of the event
+     * @param currentUserObject the user
+     * @param preambleText the preamble text (question, if != null)
+     * @param text the text
+     * @param issue the issue key
+     */
+    public QandAEvent(Type type, User currentUserObject, String preambleText, String text, Issue issue) {
         this.type = type;
         this.user = currentUserObject;
+        this.preambleText = preambleText;
         this.text = text;
         this.issue = issue;
     }
@@ -64,6 +82,13 @@ public class QandAEvent {
      */
     public Type getType() {
         return type;
+    }
+
+    /**
+     * @return the preamble text
+     */
+    public String getPreambleText() {
+        return preambleText;
     }
 
     /**

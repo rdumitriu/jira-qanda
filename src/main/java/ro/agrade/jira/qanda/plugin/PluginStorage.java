@@ -14,6 +14,7 @@ import ro.agrade.jira.qanda.listeners.StandardListener;
  * @since 1.0
  */
 public class PluginStorage {
+    private static final int DEFAULT_NO_THREADS = 2;
     private static PluginStorage ourInstance = new PluginStorage();
     private AsyncRunner runner;
     private QandAListener [] listeners;
@@ -30,7 +31,7 @@ public class PluginStorage {
      * Call it at init
      */
     public void init() {
-        runner = new AsyncRunner();
+        runner = new AsyncRunner(DEFAULT_NO_THREADS);
         listeners = new QandAListener[1];
         listeners[0] = new StandardListener(ComponentAccessor.getUserManager(),
                                             new EmailMessageHandler(ComponentAccessor.getMailServerManager(),

@@ -284,13 +284,13 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     public void addAnswer(long qid, String answer) {
         Question q = qImpl.getQuestion(qid);
         if(q == null) {
-            LOG.error(String.format("Question %d may be already deleted, qid"));
+            LOG.error(String.format("Question %d may be already deleted", qid));
             return;
         }
         Issue issue = issueManager.getIssueObject(q.getIssueId());
         checkAnswerAddPermission(issue);
         aImpl.addAnswer(qid, issue.getId(), answer);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_ADDED, getCurrentUserObject(), answer, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_ADDED, getCurrentUserObject(), q.getQuestionText(), answer, issue));
     }
 
     /**
@@ -303,13 +303,19 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     public void editAnswer(long aid, String answer) {
         Answer a = aImpl.getAnswer(aid);
         if(a == null) {
+            LOG.error(String.format("Answer %d may be already deleted", aid));
+            return;
+        }
+        Question q = qImpl.getQuestion(a.getQuestionId());
+        if(q == null) {
+            LOG.error(String.format("Question %d may be already deleted", a.getQuestionId()));
             return;
         }
         Issue issue = issueManager.getIssueObject(a.getIssueId());
         checkAnswerPermission(a, issue);
 
         aImpl.updateAnswer(aid, answer);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_MODIFIED, getCurrentUserObject(), answer, issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_MODIFIED, getCurrentUserObject(), q.getQuestionText(), answer, issue));
     }
 
     /**
@@ -323,11 +329,16 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         if(a == null) {
             return;
         }
+        Question q = qImpl.getQuestion(a.getQuestionId());
+        if(q == null) {
+            LOG.error(String.format("Question %d may be already deleted", a.getQuestionId()));
+            return;
+        }
         Issue issue = issueManager.getIssueObject(a.getIssueId());
         checkAnswerPermission(a, issue);
 
         aImpl.removeAnswer(aid);
-        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_DELETED, getCurrentUserObject(), a.getAnswerText(), issue));
+        notifyQAInternal(new QandAEvent(QandAEvent.Type.ANSWER_DELETED, getCurrentUserObject(), q.getQuestionText(), a.getAnswerText(), issue));
     }
 
     /**
@@ -473,7 +484,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                     true);
             try {
                 String version = new BuildUtilsInfoImpl().getVersion();
-                if(version.startsWith("5.0")) {
+                if(version.startsWith("5.0")) { //will never happen, support starts at 5.1 now
                     issueIndexManager.reIndex(issue);
                 } else {
                     issueIndexManager.release();
