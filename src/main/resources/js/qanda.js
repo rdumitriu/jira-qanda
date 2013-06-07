@@ -7,9 +7,9 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaquestiontext">'+ AJS.params.qaskLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield mentionable" ';
                 html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
-                html += 'style="width:500px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
+                html += 'style="width:440px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
@@ -107,9 +107,9 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">'+ AJS.params.qanswerLabel +'</label>';
-                html += '<textarea cols="60" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield mentionable" ';
                 html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
-                html += 'style="width:500px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
+                html += 'style="width:440px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
             html += '</div>';
         html += '</form>';
         return html;
