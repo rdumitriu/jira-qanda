@@ -4,6 +4,7 @@
 package ro.agrade.jira.qanda;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.issue.Issue;
 
 /**
  * The event passed on the listener
@@ -42,20 +43,20 @@ public class QandAEvent {
     /**
      * The issue key
      */
-    private String issueKey;
+    private Issue issue;
 
     /**
      * Constructor
      * @param type the type of the event
      * @param currentUserObject the user
      * @param text the text
-     * @param issueKey the issue key
+     * @param issue the issue key
      */
-    public QandAEvent(Type type, User currentUserObject, String text, String issueKey) {
+    public QandAEvent(Type type, User currentUserObject, String text, Issue issue) {
         this.type = type;
         this.user = currentUserObject;
         this.text = text;
-        this.issueKey = issueKey;
+        this.issue = issue;
     }
 
     /**
@@ -83,6 +84,13 @@ public class QandAEvent {
      * @return the issue key
      */
     public String getIssueKey() {
-        return issueKey;
+        return issue.getKey();
+    }
+
+    /**
+     * @return the issue key
+     */
+    public Issue getIssue() {
+        return issue;
     }
 }
