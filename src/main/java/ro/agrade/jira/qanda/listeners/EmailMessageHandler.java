@@ -3,23 +3,27 @@
  */
 package ro.agrade.jira.qanda.listeners;
 
-import java.util.*;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.i18n.JiraI18nResolver;
+import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
+import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.mail.server.MailServerManager;
 import com.atlassian.mail.server.SMTPMailServer;
 import com.atlassian.sal.api.message.I18nResolver;
-
+import com.atlassian.templaterenderer.TemplateRenderer;
 import ro.agrade.jira.qanda.QandAEvent;
+import ro.agrade.jira.qanda.QandAException;
 import ro.agrade.jira.qanda.plugin.PluginStorage;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
+
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,25 +101,29 @@ public class EmailMessageHandler implements MessageHandler {
         }
 
         private String createBodyFromEvent(QandAEvent qaEvent) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("\n\n");
-            sb.append(JIRAUtils.getIssueJIRAPath(props, qaEvent.getIssueKey() + "?page=ro.agrade.jira.qanda:qanda-tabpanel"));
-            sb.append("\n\n");
-            if(qaEvent.getPreambleText() != null) {
-                sb.append(i18nResolver.getText("qanda.mail.question.preamble"));
-                sb.append("\n\n");
-                sb.append(qaEvent.getPreambleText());
-                sb.append("\n\n");
+            TemplateRenderer tr = ComponentAccessor.getOSGiComponentInstanceOfType(TemplateRenderer.class);
+            if(tr == null){
+                String msg = "Could not find template renderer for email";
+                LOG.error(msg);
+                throw new QandAException(msg);
             }
-            sb.append(i18nResolver.getText("qanda.mail.firstline.1"));
-            sb.append(" ");
-            sb.append(qaEvent.getUser().getDisplayName());
-            sb.append(" [ ").append(qaEvent.getUser().getEmailAddress()).append(" ] ");
-            sb.append(i18nResolver.getText("qanda.mail.firstline.2." + qaEvent.getType().name()));
-            sb.append("\n\n");
-            sb.append(qaEvent.getText());
-            sb.append("\n");
-            return sb.toString();
+
+            Map<String, Object> vp = new HashMap<String, Object>();
+            vp = JiraVelocityUtils.getDefaultVelocityParams(vp, ComponentAccessor.getJiraAuthenticationContext());
+            vp.put("e", qaEvent);
+            vp.put("issueLink", JIRAUtils.getIssueJIRAPath(props, qaEvent.getIssueKey() + "?page=ro.agrade.jira.qanda:qanda-tabpanel"));
+            vp.put("wikiRenderer", ComponentAccessor.getRendererManager().getRendererForType("atlassian-wiki-renderer"));
+            vp.put("renderContext", new IssueRenderContext(qaEvent.getIssue()));
+            StringWriter sw = new StringWriter();
+            try {
+                tr.render("/templates/email.vm", vp, sw);
+                sw.flush();
+            } catch (IOException e) {
+                String msg = "Could not render template";
+                LOG.error(msg, e);
+                throw new QandAException(msg, e);
+            }
+            return sw.toString();
         }
 
         private String createSubjectFromEvent(QandAEvent qaEvent) {
@@ -195,9 +203,9 @@ public class EmailMessageHandler implements MessageHandler {
             msg.setSubject(subject);
 
             // Setting text content
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setContent(message, "text/plain");
-            multipart.addBodyPart(textPart);
+            MimeBodyPart contentPart = new MimeBodyPart();
+            contentPart.setContent(message, "text/html; charset=utf-8");
+            multipart.addBodyPart(contentPart);
 
             msg.setContent(multipart);
             Transport.send(msg);
