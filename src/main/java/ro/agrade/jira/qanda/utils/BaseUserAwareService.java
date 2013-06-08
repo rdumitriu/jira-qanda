@@ -34,7 +34,7 @@ public class BaseUserAwareService {
      */
     public String getCurrentUser() {
         String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.0")) {
+        if(version.startsWith("6.")) {
             return authContext.getUser().getKey();
         }
         //J5 (man, I miss conditional compiling !)
@@ -48,7 +48,7 @@ public class BaseUserAwareService {
      */
     public User getCurrentUserObject() {
         String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.0")) {
+        if(version.startsWith("6.")) {
             return authContext.getUser().getDirectoryUser();
         }
         //J5

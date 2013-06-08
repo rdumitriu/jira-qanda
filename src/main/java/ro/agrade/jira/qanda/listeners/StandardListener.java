@@ -115,7 +115,7 @@ public class StandardListener implements QandAListener {
 
     private User toUserObject(String uNameOrKey) {
         String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.0")) {
+        if(version.startsWith("6.")) {
             ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
             if(appUser == null) {
                 appUser = userManager.getUserByName(uNameOrKey);
