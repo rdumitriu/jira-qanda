@@ -1,0 +1,97 @@
+
+    <style>
+        * {
+            font-family: sans-serif;
+            font-size: 13px;
+        }
+        .title {
+            font-size: 1.25em;
+            font-weight: bolder;
+            color: #3b73af;
+            margin-bottom: 5px;
+        }
+
+        .title .issue-link {
+            font-weight: bolder;
+            color: #3b73af;
+        }
+
+        .mail {
+            padding : 15px;
+            color : #505050;
+            background-color: #f0f0f0;
+            line-height: 1.2;
+        }
+
+        .content {
+            border : 1px solid gray;
+            background-color: white;
+        }
+
+        .header {
+            background-color: #205081;
+        }
+
+        .title img {
+            border: none;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .body {
+            padding : 10px;
+        }
+
+        .preamble, .content-body {
+            margin-left: 25px;
+        }
+
+        .content-title {
+            font-weight: bold;
+            /*margin-top: 10px;*/
+            /*margin-bottom: 5px;*/
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.7em;
+        }
+    </style>
+
+    <div class="mail">
+        <div class="content">
+            <div class="header">
+                <img src="$!baseurl/images/jira_logo_small.png"></img>
+            </div>
+            <div class="body">
+                <div class="title">
+                    $i18n.getText("qanda.mail.firstline.1")&nbsp;
+                    <a class="issue-link" href="$issueLink">
+                        <img src="$baseurl$e.getIssue().getIssueTypeObject().getIconUrl()"></img>
+                        $e.getIssue().getKey() - $e.getIssue().getSummary()
+                    </a>
+                    #if($e.getPreambleText())
+                        &nbsp;
+                        $i18n.getText("qanda.mail.firstline.2")
+                    #end
+                </div>
+                #if($e.getPreambleText())
+                    <div class="preamble">
+                        $wikiRenderer.render($e.getPreambleText(), $renderContext)
+                    </div>
+                #end
+                <div class="content-title">
+                    $e.getUser().getDisplayName() ($e.getUser().getEmailAddress()) $i18n.getText("qanda.mail.firstline.2.$e.getType().name()")
+                </div>
+                <div class="content-body">
+                    $wikiRenderer.render($e.getText(), $renderContext)
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+                $i18n.getText("qanda.mail.footer.1") <br/>
+                $i18n.getText("qanda.mail.footer.2")
+        </div>
+    </div>

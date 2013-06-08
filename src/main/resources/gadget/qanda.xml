@@ -24,6 +24,7 @@
         #oauth
         #supportedLocales("gadget.common,qanda")
     </ModulePrefs>
+    <UserPref name="refresh" datatype="hidden" default_value="false" />
     <UserPref name="isConfigured" datatype="hidden" default_value="true" />
     <UserPref name="project" datatype="hidden" />
     <UserPref name="issinterval" datatype="hidden" />
