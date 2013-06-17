@@ -11,4 +11,9 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
         <beans:value>com.atlassian.sal.api.ApplicationProperties</beans:value>
       </osgi:interfaces>
     </osgi:reference-->
+    <osgi:reference id="templateRenderer">
+      <osgi:interfaces>
+        <beans:value>com.atlassian.templaterenderer.TemplateRenderer</beans:value>
+      </osgi:interfaces>
+    </osgi:reference>
 </beans:beans>

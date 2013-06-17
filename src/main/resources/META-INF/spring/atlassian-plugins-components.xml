@@ -17,6 +17,11 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
     <beans:bean id="qandaservice"
                 autowire="default"
                 class="ro.agrade.jira.qanda.QandAServiceImpl"/>
+
+    <beans:bean id="applicationContextProviderInjector"
+                autowire="default"
+                class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector"/>
+
     <osgi:service id="qandaservice_osgiService" ref="qandaservice">
         <osgi:interfaces>
             <beans:value>ro.agrade.jira.qanda.QandAService</beans:value>

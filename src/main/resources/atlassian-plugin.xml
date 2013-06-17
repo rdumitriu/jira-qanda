@@ -56,4 +56,5 @@
   <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
   <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
   <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+  <component key="applicationContextProviderInjector" class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector" public="false" />
 </atlassian-plugin>

@@ -17,6 +17,7 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import ro.agrade.jira.qanda.QandAEvent;
 import ro.agrade.jira.qanda.QandAException;
 import ro.agrade.jira.qanda.plugin.PluginStorage;
+import ro.agrade.jira.qanda.utils.ApplicationContextProvider;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import javax.mail.*;
@@ -86,22 +87,23 @@ public class EmailMessageHandler implements MessageHandler {
         public void run() {
             ClassLoader origCL = Thread.currentThread().getContextClassLoader();
             try {
+                String body = createBodyFromEvent(qaEvent);
                 Thread.currentThread().setContextClassLoader(ComponentManager.class.getClassLoader());
                 sendMail(new String[]{user.getEmailAddress()},
                          createSubjectFromEvent(qaEvent),
-                         createBodyFromEvent(qaEvent),
+                         body,
                          null);
             } catch(MessagingException e) {
-                LOG.error(String.format("Could not sent mail to recipient: %s", user.getEmailAddress()), e);
+                LOG.error(String.format("Could not send mail to recipient: %s", user.getEmailAddress()), e);
             } catch (Throwable t) {
-                LOG.error(String.format("Could not sent mail to recipient: %s", user.getEmailAddress()), t);
+                LOG.error(String.format("Could not send mail to recipient: %s", user.getEmailAddress()), t);
             } finally {
                 Thread.currentThread().setContextClassLoader(origCL);
             }
         }
 
         private String createBodyFromEvent(QandAEvent qaEvent) {
-            TemplateRenderer tr = ComponentAccessor.getOSGiComponentInstanceOfType(TemplateRenderer.class);
+            TemplateRenderer tr = ApplicationContextProvider.getBean("templateRenderer", TemplateRenderer.class);
             if(tr == null){
                 String msg = "Could not find template renderer for email";
                 LOG.error(msg);
