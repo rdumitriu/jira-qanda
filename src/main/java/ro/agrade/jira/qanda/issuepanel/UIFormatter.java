@@ -16,6 +16,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.velocity.htmlsafe.HtmlSafe;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
@@ -89,10 +90,10 @@ public class UIFormatter {
         					 avatarUrl != null 
         					 	? String.format("style=\"background-image: url(%s);\"", avatarUrl)
         					 	: "",
-        					 userObj.getName(),
+                             StringEscapeUtils.escapeHtml(userObj.getName()),
                              baseURL,
-                             userObj.getName(),
-                             userObj.getDisplayName());
+                             StringEscapeUtils.escapeHtml(userObj.getName()),
+                             StringEscapeUtils.escapeHtml(userObj.getDisplayName()));
     }
 
     /**
