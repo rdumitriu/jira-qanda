@@ -5,8 +5,8 @@ package ro.agrade.jira.qanda;
 
 import java.util.*;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.user.ApplicationUser;
 
 /**
  * The event passed on the listener
@@ -46,7 +46,7 @@ public class QandAEvent {
     /**
      * The user
      */
-    private User user;
+    private ApplicationUser user;
 
     /**
      * Additional users
@@ -65,7 +65,7 @@ public class QandAEvent {
      * @param text the text
      * @param issue the issue key
      */
-    public QandAEvent(Type type, User currentUserObject, Set<String> additionalUsers,
+    public QandAEvent(Type type, ApplicationUser currentUserObject, Set<String> additionalUsers,
                       String text, Issue issue) {
         this(type, currentUserObject, additionalUsers, null, text, issue);
     }
@@ -79,7 +79,7 @@ public class QandAEvent {
      * @param text the text
      * @param issue the issue key
      */
-    public QandAEvent(Type type, User currentUserObject, Set<String> additionalUsers,
+    public QandAEvent(Type type, ApplicationUser currentUserObject, Set<String> additionalUsers,
                       String preambleText, String text, Issue issue) {
         this.type = type;
         this.user = currentUserObject;
@@ -113,7 +113,7 @@ public class QandAEvent {
     /**
      * @return the current user
      */
-    public User getUser() {
+    public ApplicationUser getUser() {
         return user;
     }
 

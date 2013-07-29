@@ -9,6 +9,7 @@ import com.atlassian.jira.plugin.issuetabpanel.AbstractIssueTabPanel;
 import com.atlassian.jira.plugin.issuetabpanel.IssueAction;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import ro.agrade.jira.qanda.QandAService;
@@ -59,9 +60,9 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         webResourceManager.requireResource("ro.agrade.jira.qanda:qanda-resources");
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
-        User currentUser = authContext.getLoggedInUser();
+        ApplicationUser currentUser = authContext.getUser();
         boolean canOverrideActions = PermissionChecker.isUserLeadOrAdmin(permissionManager, issue, currentUser);
-        boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, user);
+        boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, JIRAUtils.toUserObject(userManager, user.getName()));
         UIFormatter formatter = new UIFormatter(userManager, authContext, avatarService, properties, rendererMgr, issue);
         String baseURL = JIRAUtils.getRelativeJIRAPath(properties);
 
@@ -86,7 +87,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
     @Override
     public boolean showPanel(Issue issue, User user) {
-        return PermissionChecker.canViewIssue(permissionManager, issue, user);
+        return PermissionChecker.canViewIssue(permissionManager, issue, JIRAUtils.toUserObject(userManager, user.getName()));
     }
 
 }

@@ -5,7 +5,10 @@ package ro.agrade.jira.qanda.utils;
 
 import java.net.URI;
 
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.util.UserManager;
 
 /**
  * The utilities. Right now, only to create the relative path to the JIRA
@@ -53,5 +56,33 @@ public final class JIRAUtils {
      */
     public static String getIssueJIRAPath(ApplicationProperties props, String issueKey) {
         return getFullJIRAPath(props) + "/browse/" + issueKey;
+    }
+
+    /**
+     * Creates an user object from a string. If not found, simply returns null
+     * @param userManager the user manager
+     * @param uNameOrKey the key
+     * @return the user, if found
+     */
+    public static User toDirectoryUserObject(UserManager userManager, String uNameOrKey) {
+        ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
+        if(appUser == null) {
+            appUser = userManager.getUserByName(uNameOrKey);
+        }
+        return appUser != null ? appUser.getDirectoryUser() : null;
+    }
+
+    /**
+     * Creates an user object from a string. If not found, simply returns null
+     * @param userManager the user manager
+     * @param uNameOrKey the key
+     * @return the user, if found
+     */
+    public static ApplicationUser toUserObject(UserManager userManager, String uNameOrKey) {
+        ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
+        if(appUser == null) {
+            appUser = userManager.getUserByName(uNameOrKey);
+        }
+        return appUser;
     }
 }

@@ -3,9 +3,8 @@
  */
 package ro.agrade.jira.qanda.utils;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.util.BuildUtilsInfoImpl;
+import com.atlassian.jira.user.ApplicationUser;
 
 /**
  * This is a base dao service. Usually, no such service like
@@ -33,12 +32,7 @@ public class BaseUserAwareService {
      * @return the current user
      */
     public String getCurrentUser() {
-        String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.")) {
-            return authContext.getUser().getKey();
-        }
-        //J5 (man, I miss conditional compiling !)
-        return authContext.getLoggedInUser().getName();
+        return authContext.getUser() != null ? authContext.getUser().getKey() : null;
     }
 
     /**
@@ -46,12 +40,7 @@ public class BaseUserAwareService {
      *
      * @return the current user
      */
-    public User getCurrentUserObject() {
-        String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.")) {
-            return authContext.getUser().getDirectoryUser();
-        }
-        //J5
-        return authContext.getLoggedInUser();
+    public ApplicationUser getCurrentUserObject() {
+        return authContext.getUser();
     }
 }

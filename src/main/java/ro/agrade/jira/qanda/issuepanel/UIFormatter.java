@@ -6,17 +6,16 @@ package ro.agrade.jira.qanda.issuepanel;
 import java.text.*;
 import java.util.*;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.avatar.Avatar.Size;
 import com.atlassian.jira.avatar.AvatarService;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.JiraDateUtils;
+import com.atlassian.velocity.htmlsafe.HtmlSafe;
 
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
@@ -58,6 +57,7 @@ public class UIFormatter {
      * @param ts the timestamp
      * @return the formatted TS, as a string
      */
+    @HtmlSafe
     public String formatTimeStamp(long ts) {
         Date d = new Date();
         d.setTime(ts);
@@ -73,12 +73,13 @@ public class UIFormatter {
      * @param user the user
      * @return the user link
      */
+    @HtmlSafe
     public String formatUser(String user) {
-        User userObj = null;
+        ApplicationUser userObj = null;
         String avatarUrl = null;
         try {
-            userObj = userManager.getUserObject(user);
-            avatarUrl = avatarService.getAvatarUrlNoPermCheck(user, Size.SMALL).toString();
+            userObj = JIRAUtils.toUserObject(userManager, user);
+            avatarUrl = avatarService.getAvatarUrlNoPermCheck(userObj, Size.SMALL).toString();
         } catch(Throwable t) { /* we do not care */ }
         if(null == userObj) {
             return user; // unknown, deleted
@@ -99,6 +100,7 @@ public class UIFormatter {
      * @param text the text to be formatted
      * @return the formatted text
      */
+    @HtmlSafe
     public String formatText(String text) {
         return rendererMgr.getRendererForType("atlassian-wiki-renderer")
                                             .render(text, renderContext);

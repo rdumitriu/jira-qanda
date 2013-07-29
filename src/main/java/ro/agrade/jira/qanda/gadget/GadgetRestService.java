@@ -7,16 +7,14 @@ import java.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.avatar.AvatarService;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.*;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.JiraDateUtils;
 
 import ro.agrade.jira.qanda.*;
 import ro.agrade.jira.qanda.issuepanel.UIFormatter;
@@ -89,9 +87,9 @@ public class GadgetRestService {
     @Produces({MediaType.APPLICATION_JSON})
     public List<GadgetConfigLabel> getProjects() {
         List<GadgetConfigLabel> lbls = new ArrayList<GadgetConfigLabel>();
-        Collection<Project> browsePrj = permMgr.getProjectObjects(Permissions.BROWSE, authContext.getLoggedInUser());
+        ApplicationUser user = authContext.getUser();
+        Collection<Project> browsePrj = permMgr.getProjects(Permissions.BROWSE, user);
         if(browsePrj != null) {
-            User user = authContext.getLoggedInUser();
             for(Project p : browsePrj) {
                 if(permMgr.hasPermission(Permissions.COMMENT_ISSUE, p, user) &&
                         permMgr.hasPermission(Permissions.BROWSE, p, user)) {

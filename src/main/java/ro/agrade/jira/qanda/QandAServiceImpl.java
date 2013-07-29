@@ -5,7 +5,6 @@ package ro.agrade.jira.qanda;
 
 import java.util.*;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.event.type.EventDispatchOption;
 import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.index.DefaultIndexManager;
@@ -13,7 +12,7 @@ import com.atlassian.jira.issue.index.IssueIndexManager;
 import com.atlassian.jira.issue.search.*;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.security.*;
-import com.atlassian.jira.util.BuildUtilsInfoImpl;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ImportUtils;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
@@ -101,8 +100,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         for(Answer a : answers) {
             Question q = questionsMap.get(a.getQuestionId());
             if(q == null) {
-                LOG.warn(String.format("Got answer %d, but could not find the question %d ?!?",
-                                       a.getAnswerId(), a.getQuestionId()));
+                if(LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Got answer %d, but could not find the question %d ?!?",
+                                            a.getAnswerId(), a.getQuestionId()));
+                }
                 continue;
             }
             q.getAnswers().add(a);
@@ -131,7 +132,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
 
             Query query = jqlQueryBuilder.buildQuery();
 
-            User user = getCurrentUserObject();
+            ApplicationUser user = getCurrentUserObject();
             DefaultIndexManager.flushThreadLocalSearchers();
             JiraAuthenticationContextImpl.clearRequestCache();
 
@@ -502,18 +503,14 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         ImportUtils.setIndexIssues(true);
         try {
             // updateIssue (should) also handle the re-index of the issue
-            issueManager.updateIssue(getCurrentUserObject(), issue,
-                    EventDispatchOption.ISSUE_UPDATED,
-                    true);
+            issueManager.updateIssue(getCurrentUserObject() != null ? getCurrentUserObject().getDirectoryUser() : null,
+                                     issue,
+                                     EventDispatchOption.ISSUE_UPDATED,
+                                     true);
             try {
-                String version = new BuildUtilsInfoImpl().getVersion();
-                if(version.startsWith("5.0")) { //will never happen, support starts at 5.1 now
-                    issueIndexManager.reIndex(issue);
-                } else {
-                    issueIndexManager.release();
-                    issueIndexManager.reIndex(issue);
-                    issueIndexManager.release();
-                }
+                issueIndexManager.release();
+                issueIndexManager.reIndex(issue);
+                issueIndexManager.release();
             } catch(Exception ex) {
                 LOG.warn("Could not reindex ?!?.", ex);
                 throw ex;

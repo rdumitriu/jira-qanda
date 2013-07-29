@@ -9,6 +9,8 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.issuetabpanel.AbstractIssueAction;
 import com.atlassian.jira.plugin.issuetabpanel.IssueTabPanelModuleDescriptor;
+import com.atlassian.jira.user.ApplicationUser;
+
 import ro.agrade.jira.qanda.Question;
 
 
@@ -24,13 +26,13 @@ public class QandAIssueAction extends AbstractIssueAction {
     private final Question question;
     private final boolean canOverrideActions;
     private final boolean canAddToIssueDescription;
-    private final User currentUser;
+    private final ApplicationUser currentUser;
     private final String jiraBaseUrl;
     private final UIFormatter uiFormatter;
 
     public QandAIssueAction(final IssueTabPanelModuleDescriptor descriptor,
                             final Issue issue,
-                            final User currentUser,
+                            final ApplicationUser currentUser,
                             final Question question,
                             final boolean canOverrideActions,
                             final boolean canAddToIssueDescription,

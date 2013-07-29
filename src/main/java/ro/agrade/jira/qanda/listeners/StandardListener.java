@@ -8,7 +8,6 @@ import java.util.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.BuildUtilsInfoImpl;
 
 import ro.agrade.jira.qanda.QandAEvent;
 import ro.agrade.jira.qanda.QandAListener;
@@ -114,19 +113,10 @@ public class StandardListener implements QandAListener {
     }
 
     private User toUserObject(String uNameOrKey) {
-        String version = new BuildUtilsInfoImpl().getVersion();
-        if(version.startsWith("6.")) {
-            ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
-            if(appUser == null) {
-                appUser = userManager.getUserByName(uNameOrKey);
-            }
-            return appUser != null ? appUser.getDirectoryUser() : null;
-        } else {
-            User user = userManager.getUser(uNameOrKey);
-            if(user == null) {
-                user = userManager.getUserObject(uNameOrKey);
-            }
-            return user;
+        ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
+        if(appUser == null) {
+            appUser = userManager.getUserByName(uNameOrKey);
         }
+        return appUser != null ? appUser.getDirectoryUser() : null;
     }
 }
