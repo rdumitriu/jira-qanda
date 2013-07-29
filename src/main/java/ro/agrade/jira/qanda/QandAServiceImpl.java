@@ -507,13 +507,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                     true);
             try {
                 String version = new BuildUtilsInfoImpl().getVersion();
-                if(version.startsWith("5.0")) { //will never happen, support starts at 5.1 now
-                    issueIndexManager.reIndex(issue);
-                } else {
-                    issueIndexManager.release();
-                    issueIndexManager.reIndex(issue);
-                    issueIndexManager.release();
-                }
+                issueIndexManager.release();
+                issueIndexManager.reIndex(issue);
+                issueIndexManager.release();
             } catch(Exception ex) {
                 LOG.warn("Could not reindex ?!?.", ex);
                 throw ex;

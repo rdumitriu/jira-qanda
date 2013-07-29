@@ -9,21 +9,21 @@ import java.util.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.avatar.Avatar.Size;
 import com.atlassian.jira.avatar.AvatarService;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.RendererManager;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.JiraDateUtils;
+import com.atlassian.velocity.htmlsafe.HtmlSafe;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 /**
- * Formats the
+ * Formats the pieces of our QandA
  *
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
@@ -58,6 +58,7 @@ public class UIFormatter {
      * @param ts the timestamp
      * @return the formatted TS, as a string
      */
+    @HtmlSafe
     public String formatTimeStamp(long ts) {
         Date d = new Date();
         d.setTime(ts);
@@ -73,6 +74,7 @@ public class UIFormatter {
      * @param user the user
      * @return the user link
      */
+    @HtmlSafe
     public String formatUser(String user) {
         User userObj = null;
         String avatarUrl = null;
@@ -88,10 +90,10 @@ public class UIFormatter {
         					 avatarUrl != null 
         					 	? String.format("style=\"background-image: url(%s);\"", avatarUrl)
         					 	: "",
-        					 userObj.getName(),
+                             StringEscapeUtils.escapeHtml(userObj.getName()),
                              baseURL,
-                             userObj.getName(),
-                             userObj.getDisplayName());
+                             StringEscapeUtils.escapeHtml(userObj.getName()),
+                             StringEscapeUtils.escapeHtml(userObj.getDisplayName()));
     }
 
     /**
@@ -99,6 +101,7 @@ public class UIFormatter {
      * @param text the text to be formatted
      * @return the formatted text
      */
+    @HtmlSafe
     public String formatText(String text) {
         return rendererMgr.getRendererForType("atlassian-wiki-renderer")
                                             .render(text, renderContext);

@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.agrade.jira</groupId>
     <artifactId>qanda</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6-j5-SNAPSHOT</version>
 
     <organization>
         <name>AGRADE</name>
@@ -132,7 +132,7 @@
     </build>
 
     <properties>
-        <jira.version>6.0</jira.version>
+        <jira.version>5.1</jira.version>
         <jira.data.version>5.1</jira.data.version>
         <amps.version>4.1.4</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>

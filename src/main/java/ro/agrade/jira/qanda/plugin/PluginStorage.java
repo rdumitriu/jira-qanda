@@ -1,7 +1,6 @@
 package ro.agrade.jira.qanda.plugin;
 
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.sal.api.message.I18nResolver;
 
 import ro.agrade.jira.qanda.QandAListener;
 import ro.agrade.jira.qanda.listeners.EmailMessageHandler;
