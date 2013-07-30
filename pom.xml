@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.agrade.jira</groupId>
     <artifactId>qanda</artifactId>
-    <version>1.0.6-j5-SNAPSHOT</version>
+    <version>1.0.6-j5</version>
 
     <organization>
         <name>AGRADE</name>

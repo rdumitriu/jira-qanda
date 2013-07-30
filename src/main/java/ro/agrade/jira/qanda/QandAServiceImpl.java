@@ -101,8 +101,10 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         for(Answer a : answers) {
             Question q = questionsMap.get(a.getQuestionId());
             if(q == null) {
-                LOG.warn(String.format("Got answer %d, but could not find the question %d ?!?",
-                                       a.getAnswerId(), a.getQuestionId()));
+                if(LOG.isDebugEnabled()) {
+                    LOG.debug(String.format("Got answer %d, but could not find the question %d ?!?",
+                                            a.getAnswerId(), a.getQuestionId()));
+                }
                 continue;
             }
             q.getAnswers().add(a);
