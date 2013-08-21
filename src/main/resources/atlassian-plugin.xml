@@ -29,6 +29,7 @@
     <description>Show Questions and Answers tab.</description>
     <label key="qanda.issue-tab.label"/>
     <resource type="velocity" name="view" location="templates/qanda-panel.vm"/>
+    <supports-ajax-load>true</supports-ajax-load>
   </issue-tabpanel>
   <rest key="ro.agrade.jira.qanda.rest" path="/agrade/qanda" version="1.0">
     <description>REST in peace interface</description>
