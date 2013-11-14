@@ -10,8 +10,6 @@ import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.i18n.JiraI18nResolver;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.util.JiraVelocityUtils;
-import com.atlassian.mail.server.MailServerManager;
-import com.atlassian.mail.server.SMTPMailServer;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import ro.agrade.jira.qanda.QandAEvent;
@@ -21,7 +19,6 @@ import ro.agrade.jira.qanda.utils.ApplicationContextProvider;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import javax.mail.*;
-import javax.mail.internet.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
@@ -35,14 +32,11 @@ import org.apache.commons.logging.LogFactory;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class EmailMessageHandler implements MessageHandler {
-    private static final Log LOG = LogFactory.getLog(EmailMessageHandler.class);
-    private final MailServerManager mailServerManager;
+public abstract class AbstractEmailMessageHandler implements MessageHandler {
+    private static final Log LOG = LogFactory.getLog(AbstractEmailMessageHandler.class);
     private final ApplicationProperties props;
 
-    public EmailMessageHandler(final MailServerManager mailServerManager,
-                               final ApplicationProperties props) {
-        this.mailServerManager = mailServerManager;
+    public AbstractEmailMessageHandler(final ApplicationProperties props) {
         this.props = props;
     }
 
@@ -52,7 +46,7 @@ public class EmailMessageHandler implements MessageHandler {
             LOG.warn(String.format("Cannot sent mail to user %s", user != null ? user.getEmailAddress() : "-?-"));
             return;
         }
-        PluginStorage.getInstance().submitTask(new EmailTask(user, qaEvent));
+        PluginStorage.submitTask(new EmailTask(user, qaEvent));
         LOG.debug("Email task submitted");
     }
 
@@ -135,83 +129,18 @@ public class EmailMessageHandler implements MessageHandler {
                                  qaEvent.getUser().getDisplayName(),
                                  action);
         }
-
-        private void sendMail(String [] recipients,
-                              String subject,
-                              String message ,
-                              String from) throws MessagingException {
-
-            SMTPMailServer server = mailServerManager.getDefaultSMTPMailServer();
-            if(server == null) {
-                LOG.debug("Email server is not configured. QandA is unable to send mails ...");
-                return;
-            }
-            LOG.debug("Email message: initializing.");
-            //Set the host smtp address
-            Properties props = new Properties();
-
-            String proto = server.getMailProtocol().getProtocol();
-
-            props.put("mail.transport.protocol", proto);
-            props.put("mail." + proto + ".host", server.getHostname());
-            props.put("mail." + proto + ".port", server.getPort());
-
-            String username = server.getUsername();
-            String password = server.getPassword();
-
-
-            Authenticator auth = null;
-
-            if(username != null && password != null) {
-                auth = new SMTPAuthenticator(username, password);
-                props.put("mail." + proto + ".auth", "true");
-            }
-            Session session;
-            try {
-                session = auth != null
-                        ? Session.getDefaultInstance(props, auth)
-                        : Session.getDefaultInstance(props);
-            } catch (SecurityException ex){
-                LOG.warn("Could not get default session. Attempting to create a new one.");
-                session = auth != null
-                        ? Session.getInstance(props, auth)
-                        : Session.getInstance(props);
-            }
-
-            // create a message
-            MimeMessage msg = new MimeMessage(session);
-            Multipart multipart = new MimeMultipart();
-
-            if(from == null) {
-                from = server.getDefaultFrom();
-            }
-            // set the from address
-            if(from != null) {
-                InternetAddress addressFrom = new InternetAddress(from);
-                msg.setFrom(addressFrom);
-            }
-
-            if(recipients != null && recipients.length > 0 ) {
-                // set TO address(es)
-                InternetAddress[] addressTo = new InternetAddress[recipients.length];
-                for (int i = 0; i < recipients.length; i++){
-                    addressTo[i] = new InternetAddress(recipients[i]);
-                }
-                msg.setRecipients(Message.RecipientType.TO, addressTo);
-            }
-
-
-            // Setting the Subject
-            msg.setSubject(subject);
-
-            // Setting text content
-            MimeBodyPart contentPart = new MimeBodyPart();
-            contentPart.setContent(message, "text/html; charset=utf-8");
-            multipart.addBodyPart(contentPart);
-
-            msg.setContent(multipart);
-            Transport.send(msg);
-            LOG.debug("Email message sent successfully.");
-        }
     }
+
+    /**
+     * Send an email
+     * @param recipients to
+     * @param subject subject
+     * @param message the message
+     * @param from from.
+     * @throws MessagingException
+     */
+    protected abstract void sendMail(String [] recipients,
+                          String subject,
+                          String message ,
+                          String from) throws MessagingException;
 }
