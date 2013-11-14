@@ -465,3 +465,9 @@ AJS.$(document).ready(function() {
     	QANDA.toggleAnswersBlock(AJS.$(this));
     });
 });
+
+if(JIRA && JIRA.ViewIssueTabs){
+    JIRA.ViewIssueTabs.onTabReady(function() {
+        AJS.$.extend(AJS.params,JIRA.parseOptionsFromFieldset( AJS.$("#qandaParameterContainer").find(".parameters") ))
+    })
+}
