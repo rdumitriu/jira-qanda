@@ -70,19 +70,23 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             LOG.debug(String.format("Loading questions for issue %s", key));
         }
         Issue issue = issueManager.getIssueObject(key);
-        List<Question> questionList = qImpl.getQuestionsForIssue(issue.getId());
-        List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
-        questionList = compileQuestionsWithAnswers(questionList, answers);
-        if(LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Done loading questions for issue %s", key));
-        }
-        Collections.sort(questionList, new Comparator<Question>() {
-            @Override
-            public int compare(Question o1, Question o2) {
-                return (int)(o2.getTimeStamp() - o1.getTimeStamp());
+
+        if(PermissionChecker.canViewIssue(permissionManager, issue, getCurrentUserObject())) {
+            List<Question> questionList = qImpl.getQuestionsForIssue(issue.getId());
+            List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
+            questionList = compileQuestionsWithAnswers(questionList, answers);
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Done loading questions for issue %s", key));
             }
-        });
-        return questionList;
+            Collections.sort(questionList, new Comparator<Question>() {
+                @Override
+                public int compare(Question o1, Question o2) {
+                    return (int)(o2.getTimeStamp() - o1.getTimeStamp());
+                }
+            });
+            return questionList;
+        }
+        return new ArrayList<Question>();
     }
 
     // Unfortunately, Qfbiz simply doesn't know too much about joins
@@ -142,7 +146,9 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             List<Issue> issues = results.getIssues();
             List<Long> issueIds = new ArrayList<Long>();
             for(Issue iss : issues) {
-                issueIds.add(iss.getId());
+                if(PermissionChecker.canViewIssue(permissionManager, iss, getCurrentUserObject())) {
+                    issueIds.add(iss.getId());
+                }
             }
 
             List<Question> questionList = qImpl.getUnresolvedQuestionsForIssues(issueIds);
@@ -557,7 +563,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     }
 
     private void notifyQAInternal(QandAEvent qaEvent) {
-        for(QandAListener l : PluginStorage.getInstance().getConfiguredListeners()) {
+        for(QandAListener l : PluginStorage.getConfiguredListeners()) {
             l.onEvent(qaEvent);
         }
     }
