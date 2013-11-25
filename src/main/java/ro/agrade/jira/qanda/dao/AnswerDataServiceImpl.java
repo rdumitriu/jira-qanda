@@ -34,6 +34,29 @@ public class AnswerDataServiceImpl extends BaseUserAwareService implements Answe
         this.delegator = GenericDelegator.getGenericDelegator("default");
     }
 
+    public List<Answer> getAllAnswers() {
+        try {
+            List<GenericValue> vals = delegator.findAll(ENTITY);
+            return fromGenericValue(vals);
+        } catch(GenericEntityException e) {
+            String msg = "Could not load all answers ?!?";
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    public void changeUser(Answer a, String newName) {
+        try {
+            GenericValue v = delegator.findByPrimaryKey(makePk(a.getAnswerId()));
+            v.setString(USER_FIELD, newName);
+            delegator.store(v);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not update answer %d ?!?", a.getAnswerId());
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
     /**
      * Gets one single answer
      *

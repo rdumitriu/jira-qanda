@@ -43,6 +43,12 @@
   <component key="qandaservice" class="ro.agrade.jira.qanda.QandAServiceImpl" public="true">
     <interface>ro.agrade.jira.qanda.QandAService</interface>
   </component>
+
+    <component key="userUpgradeTask" name="User Upgrade Task"
+               class="ro.agrade.jira.qanda.plugin.UpgradeTask1_0_9" public="true">
+        <interface>com.atlassian.sal.api.upgrade.PluginUpgradeTask</interface>
+    </component>
+
   <gadget key="quanda-gadget" name="Question Stream" location="gadget/qanda.xml">
     <param name="roles-required">browse</param>
   </gadget>

@@ -37,6 +37,33 @@ public class QuestionDataServiceImpl extends BaseUserAwareService implements Que
     }
 
     /**
+     * Used only for management tasks. It should not leak
+     * @return the list of all the questions
+     */
+    public List<Question> getAllQuestions() {
+        try {
+            List<GenericValue> list = delegator.findAll(ENTITY);
+            return fromGenericValue(list);
+        } catch(GenericEntityException e) {
+            String msg = "Could not load all questions ?!?";
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    public void changeUser(Question q, String newName) {
+        try {
+            GenericValue v = delegator.findByPrimaryKey(makePk(q.getId()));
+            v.setString(USER_FIELD, newName);
+            delegator.store(v);
+        } catch(GenericEntityException e) {
+            String msg = String.format("Could not save question %d ?!?", q.getId());
+            LOG.error(msg);
+            throw new OfbizDataException(msg, e);
+        }
+    }
+
+    /**
      * Gets all undeleted questions
      * @param issueId the issue id
      * @return the list of questions

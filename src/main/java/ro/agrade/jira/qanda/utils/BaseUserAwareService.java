@@ -32,7 +32,7 @@ public class BaseUserAwareService {
      * @return the current user
      */
     public String getCurrentUser() {
-        return authContext.getUser() != null ? authContext.getUser().getKey() : null;
+        return authContext.getUser() != null ? authContext.getUser().getName() : null;
     }
 
     /**
