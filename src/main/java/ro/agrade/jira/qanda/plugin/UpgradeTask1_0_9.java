@@ -59,9 +59,15 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
         List<Answer> answers = scanAnswers(users);
         //we have the user keys, let's see what has changed
         Map<String, String> diffKeyUName = calculateDifference(users);
-        //do the change
-        processQuestions(questions, diffKeyUName);
-        processAnswers(answers, diffKeyUName);
+        if(diffKeyUName.size() > 0) {
+            LOG.info(String.format("Upgrade task: There are %d users to be touched.",
+                                   diffKeyUName.size()));
+            //do the change
+            processQuestions(questions, diffKeyUName);
+            processAnswers(answers, diffKeyUName);
+        } else {
+            LOG.info("Upgrade task: luckily for you, no users need to be touched");
+        }
     }
 
     private void processAnswers(List<Answer> answers, Map<String, String> diffKeyUName) {
@@ -138,6 +144,6 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
 
     @Override
     public String getPluginKey() {
-        return "ro.agrade.jira.qanda-pro";
+        return "ro.agrade.jira.qanda";
     }
 }
