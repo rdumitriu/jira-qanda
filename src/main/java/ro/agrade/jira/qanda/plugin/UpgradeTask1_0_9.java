@@ -30,25 +30,21 @@ import org.apache.commons.logging.LogFactory;
 public class UpgradeTask1_0_9 implements PluginUpgradeTask {
     private static final Log LOG = LogFactory.getLog(UpgradeTask1_0_9.class);
 
-    private PluginSettings settings;
     private final UserManager userManager;
 
-    public UpgradeTask1_0_9(PluginSettingsFactory pluginSettingsFactory, UserManager userManager) {
-        settings = pluginSettingsFactory.createGlobalSettings();
+    public UpgradeTask1_0_9(UserManager userManager) {
         this.userManager = userManager;
     }
 
     @Override
     public Collection<Message> doUpgrade() throws Exception {
-        String propKey = getPluginKey() + ":usersMigrated";
-        if(settings.get(propKey) == null || settings.get(propKey).equals("false")) {
-            try {
-                migrateUsers();
-                settings.put(propKey, "true");
-            } catch(Throwable t) {
-                LOG.error("Failed to migrate users", t);
-            }
+        LOG.debug("Upgrading QandA mapping from user key to username");
+        try {
+            migrateUsers();
+        } catch(Throwable t) {
+            LOG.error("Failed to migrate users, but it's not that bad.", t);
         }
+
         return new ArrayList<Message>();
     }
 
@@ -61,7 +57,7 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
         Map<String, String> diffKeyUName = calculateDifference(users);
         if(diffKeyUName.size() > 0) {
             LOG.info(String.format("Upgrade task: There are %d users to be touched.",
-                                   diffKeyUName.size()));
+                    diffKeyUName.size()));
             //do the change
             processQuestions(questions, diffKeyUName);
             processAnswers(answers, diffKeyUName);
@@ -79,6 +75,10 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
             String key = a.getUser();
             String newName = diffKeyUName.get(key);
             if(newName != null) {
+                if(LOG.isDebugEnabled()){
+                    LOG.debug(String.format("Changing owner of answer %s from %s to %s",
+                            a.getAnswerId(), key, newName));
+                }
                 impl.changeUser(a, newName);
             }
         }
@@ -93,6 +93,10 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
             String key = q.getUser();
             String newName = diffKeyUName.get(key);
             if(newName != null) {
+                if(LOG.isDebugEnabled()){
+                    LOG.debug(String.format("Changing owner of question %s from %s to %s",
+                            q.getId(), key, newName));
+                }
                 impl.changeUser(q, newName);
             }
         }
@@ -103,6 +107,10 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
         for(String s : users) {
             ApplicationUser u = JIRAUtils.toUserObject(userManager, s);
             if(u != null && !u.getKey().equals(u.getName())) {
+                if(LOG.isDebugEnabled()){
+                    LOG.debug(String.format("Found user mismatch key:%s username:%s",
+                            u.getKey(), u.getName()));
+                }
                 ret.put(u.getKey(), u.getName());
             }
         }
@@ -131,10 +139,9 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
         return questions;
     }
 
-
     @Override
     public int getBuildNumber() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -144,6 +151,6 @@ public class UpgradeTask1_0_9 implements PluginUpgradeTask {
 
     @Override
     public String getPluginKey() {
-        return "ro.agrade.jira.qanda";
+        return "ro.agrade.jira.qanda-pro";
     }
 }
