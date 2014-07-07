@@ -32,7 +32,6 @@ import com.atlassian.jira.util.SimpleErrorCollection;
 import org.apache.commons.lang.StringUtils;
 import ro.agrade.jira.qanda.ExpertGroup;
 import ro.agrade.jira.qanda.ExpertGroupService;
-import ro.agrade.jira.qanda.plugin.LicenseUtil;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import javax.ws.rs.*;
@@ -112,21 +111,18 @@ public class QandAMentionsRestService {
                                     @QueryParam ("maxResults") Integer maxResults,
                                     @QueryParam ("projectKey") String projectKey) throws URISyntaxException {
         List<UserBean> convertedEgs = new ArrayList<UserBean>();
-        if(LicenseUtil.isLicenseValid()){
 
-            List<ExpertGroup> egs = egService.getExpertGroupsForProject(projectKeyFromName(projectKey));
-            Map<String, URI> egAvatars = new HashMap<String, URI>();
-            egAvatars.put("16x16", new URI(JIRAUtils.getRelativeJIRAPath(appProps).concat("/images/icons/filter_public.gif")));
 
-            // create expert group autocomplete
-            for(ExpertGroup eg : egs){
-                if(eg.getName().toLowerCase().startsWith(username.toLowerCase()) ||
-                   eg.getDescription().toLowerCase().startsWith(username.toLowerCase())){
-                    convertedEgs.add(convertExpertGroupToUserBean(eg, egAvatars));
-                }
+        List<ExpertGroup> egs = egService.getExpertGroupsForProject(projectKeyFromName(projectKey));
+        Map<String, URI> egAvatars = new HashMap<String, URI>();
+        egAvatars.put("16x16", new URI(JIRAUtils.getRelativeJIRAPath(appProps).concat("/images/icons/filter_public.gif")));
+
+        // create expert group autocomplete
+        for(ExpertGroup eg : egs){
+            if(eg.getName().toLowerCase().startsWith(username.toLowerCase()) ||
+               eg.getDescription().toLowerCase().startsWith(username.toLowerCase())){
+                convertedEgs.add(convertExpertGroupToUserBean(eg, egAvatars));
             }
-        } else {
-            LOG.debug("Ignoring expert groups in autocomplete due to invalid license.");
         }
 
         final List<User> page = limitUserSearch(startAt, maxResults, findUsers(username));

@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * File: GenericDelegatorLoader.java
  */
 package ro.agrade.jira.qanda.dao;
@@ -14,9 +17,11 @@ import org.ofbiz.core.entity.model.*;
 import org.ofbiz.core.util.*;
 import org.w3c.dom.*;
 
+import ro.agrade.jira.qanda.utils.ResourceUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import ro.agrade.jira.qanda.utils.ResourceUtils;
+
 
 /**
  * Class for adding extra functionality to generic delegator. Given a generic

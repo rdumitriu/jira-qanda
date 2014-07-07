@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda;
@@ -69,7 +72,6 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             LOG.debug(String.format("Loading questions for issue %s", key));
         }
         Issue issue = issueManager.getIssueObject(key);
-
         if(PermissionChecker.canViewIssue(permissionManager, issue, getCurrentUserObject())) {
             List<Question> questionList = qImpl.getQuestionsForIssue(issue.getId());
             List<Answer> answers = aImpl.getAnswersForIssue(issue.getId());
@@ -106,7 +108,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
             if(q == null) {
                 if(LOG.isDebugEnabled()) {
                     LOG.debug(String.format("Got answer %d, but could not find the question %d ?!?",
-                                            a.getAnswerId(), a.getQuestionId()));
+                                           a.getAnswerId(), a.getQuestionId()));
                 }
                 continue;
             }
@@ -118,39 +120,20 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
     /**
      * Get all the questions which are unresolved for the specified project
      *
-     * @param project the project
+     * @param prjflt the project or filter
      * @param timePeriod the time period taken into account
      * @return the project questions
      */
     @Override
     public List<Question>
-    getUnsolvedQuestionsForProject(String project, TimePeriod timePeriod) {
+    getUnsolvedQuestionsForProjectOrFilter(String prjflt, TimePeriod timePeriod) {
         try {
             if(LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Loading questions for project %s", project));
+                LOG.debug(String.format("Loading questions for project or filter %s", prjflt));
             }
-            JqlQueryBuilder jqlQueryBuilder = JqlQueryBuilder.newBuilder();
-            jqlQueryBuilder.where().resolution().isEmpty();
-            jqlQueryBuilder.where().and().project().eq(project);
-            jqlQueryBuilder.where().and().updatedAfter(timePeriod.getDateFromNow());
+            List<Long> issueIds = getFilteredIssueIds(prjflt, timePeriod);
 
-            Query query = jqlQueryBuilder.buildQuery();
-
-            ApplicationUser user = getCurrentUserObject();
-            DefaultIndexManager.flushThreadLocalSearchers();
-            JiraAuthenticationContextImpl.clearRequestCache();
-
-            SearchResults results = searchProvider.search(query, user, PagerFilter.getUnlimitedFilter());
-
-            List<Issue> issues = results.getIssues();
-            List<Long> issueIds = new ArrayList<Long>();
-            for(Issue iss : issues) {
-                if(PermissionChecker.canViewIssue(permissionManager, iss, getCurrentUserObject())) {
-                    issueIds.add(iss.getId());
-                }
-            }
-
-            List<Question> questionList = qImpl.getUnresolvedQuestionsForIssues(issueIds);
+            List<Question> questionList = qImpl.getUnresolvedQuestionsForIssues(issueIds, null);
             List<Answer> answerList = aImpl.getAnswersForIssues(issueIds);
 
             questionList = compileQuestionsWithAnswers(questionList, answerList);
@@ -161,11 +144,78 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
                 }
             });
             if(LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Done loading questions for project %s", project));
+                LOG.debug(String.format("Done loading questions for project /filter %s", prjflt));
             }
             return questionList;
         } catch (SearchException e) {
-            String msg = "Exception while getting questions for project " + project;
+            String msg = "Exception while getting questions for project / filter " + prjflt;
+            LOG.error(msg, e);
+            throw new QandAException(msg, e);
+        }
+    }
+
+    private List<Long> getFilteredIssueIds(String prjflt, TimePeriod timePeriod) throws SearchException {
+        JqlQueryBuilder jqlQueryBuilder = JqlQueryBuilder.newBuilder();
+        jqlQueryBuilder.where().resolution().isEmpty();
+        if(identifierIsProject(prjflt)) {
+            jqlQueryBuilder.where().and().project().eq(prjflt);
+        } else {
+            jqlQueryBuilder.where().and().savedFilter(prjflt);
+        }
+        if(null != timePeriod.getDateFromNow()) {
+            jqlQueryBuilder.where().and().updatedAfter(timePeriod.getDateFromNow());
+        }
+
+        Query query = jqlQueryBuilder.buildQuery();
+
+        ApplicationUser user = getCurrentUserObject();
+        DefaultIndexManager.flushThreadLocalSearchers();
+        JiraAuthenticationContextImpl.clearRequestCache();
+
+        SearchResults results = searchProvider.search(query, user, PagerFilter.getUnlimitedFilter());
+
+        List<Issue> issues = results.getIssues();
+        List<Long> issueIds = new ArrayList<Long>();
+        for(Issue iss : issues) {
+            if(PermissionChecker.canViewIssue(permissionManager, iss, getCurrentUserObject())) {
+                issueIds.add(iss.getId());
+            }
+        }
+        return issueIds;
+    }
+
+    /**
+     * Get all the questions which are unresolved for the specified project
+     *
+     * @param prjflt the project or filter
+     * @param timePeriod the time period taken into account
+     * @return the project questions
+     */
+    @Override
+    public List<Question>
+    getMyUnsolvedQuestionsForProjectOrFilter(String prjflt, TimePeriod timePeriod) {
+        try {
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Loading my questions for project or filter %s", prjflt));
+            }
+            List<Long> issueIds = getFilteredIssueIds(prjflt, timePeriod);
+
+            List<Question> questionList = qImpl.getUnresolvedQuestionsForIssues(issueIds, getCurrentUser());
+            List<Answer> answerList = aImpl.getAnswersForIssues(issueIds);
+
+            questionList = compileQuestionsWithAnswers(questionList, answerList);
+            Collections.sort(questionList, new Comparator<Question>() {
+                @Override
+                public int compare(Question o1, Question o2) {
+                    return (int)(o1.getTimeStamp() - o2.getTimeStamp());
+                }
+            });
+            if(LOG.isDebugEnabled()) {
+                LOG.debug(String.format("Done loading questions for project /filter %s", prjflt));
+            }
+            return questionList;
+        } catch (SearchException e) {
+            String msg = "Exception while getting questions for project / filter " + prjflt;
             LOG.error(msg, e);
             throw new QandAException(msg, e);
         }
@@ -509,8 +559,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         ImportUtils.setIndexIssues(true);
         try {
             // updateIssue (should) also handle the re-index of the issue
-            issueManager.updateIssue(getCurrentUserObject() != null ? getCurrentUserObject().getDirectoryUser() : null,
-                                     issue,
+            issueManager.updateIssue(getCurrentUserObject().getDirectoryUser(), issue,
                                      EventDispatchOption.ISSUE_UPDATED,
                                      true);
             try {
@@ -565,5 +614,13 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         for(QandAListener l : PluginStorage.getConfiguredListeners()) {
             l.onEvent(qaEvent);
         }
+    }
+
+    private boolean identifierIsProject(String prjflt) {
+        try {
+            Long.parseLong(prjflt);
+            return false;
+        } catch(NumberFormatException e) {}
+        return true;
     }
 }

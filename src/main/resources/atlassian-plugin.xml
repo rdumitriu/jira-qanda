@@ -1,67 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
-  <plugin-info>
-    <description>${project.description}</description>
-    <version>${project.version}</version>
-    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
-    <param name="plugin-icon">images/icon_question16.png</param>
-    <param name="plugin-logo">images/icon_question72.png</param>
-    <param name="plugin-banner">images/banner.png</param>
-  </plugin-info>
-  <!-- add our i18n resource -->
-  <resource type="i18n" name="i18n" location="qanda"/>
-  <!-- add our web resources -->
-  <web-resource key="qanda-resources" name="qanda Web Resources">
-    <dependency>com.atlassian.auiplugin:ajs</dependency>
-    <resource type="download" name="qanda.css" location="/css/qanda.css"/>
-    <resource type="download" name="qanda.js" location="/js/qanda.js"/>
-    <resource type="download" name="images/" location="/images"/>
-    <context>atl.general</context>
-  </web-resource>
-  <web-resource key="qanda-gadget-resources" name="qanda Gadget Web Resources">
-    <dependency>com.atlassian.auiplugin:ajs</dependency>
-    <resource type="download" name="qanda.css" location="/css/qanda.css"/>
-    <resource type="download" name="qanda-gadget.js" location="/js/qanda-gadget.js"/>
-    <resource type="download" name="images/" location="/images"/>
-  </web-resource>
-  <issue-tabpanel key="qanda-tabpanel" name="Q and A" class="ro.agrade.jira.qanda.issuepanel.QandAIssuePanel">
-    <description>Show Questions and Answers tab.</description>
-    <label key="qanda.issue-tab.label"/>
-    <resource type="velocity" name="view" location="templates/qanda-panel.vm"/>
-    <supports-ajax-load>true</supports-ajax-load>
-  </issue-tabpanel>
-  <rest key="ro.agrade.jira.qanda.rest" path="/agrade/qanda" version="1.0">
-    <description>REST in peace interface</description>
-  </rest>
-  <component key="qandadaoserviceansw" class="ro.agrade.jira.qanda.dao.AnswerDataServiceImpl" public="false">
-    <interface>ro.agrade.jira.qanda.dao.AnswerDataService</interface>
-  </component>
-  <component key="qandadaoservicequest" class="ro.agrade.jira.qanda.dao.QuestionDataServiceImpl" public="false">
-    <interface>ro.agrade.jira.qanda.dao.QuestionDataService</interface>
-  </component>
-  <component key="qandaservice" class="ro.agrade.jira.qanda.QandAServiceImpl" public="true">
-    <interface>ro.agrade.jira.qanda.QandAService</interface>
-  </component>
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+        <param name="plugin-banner">images/banner.png</param>
+        <param name="vendor-icon">images/vendor_icon_16.png</param>
+        <param name="vendor-logo">images/vendor_logo_72.png</param>
+        <param name="atlassian-licensing-enabled">true</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="qanda"/>
+
+    <!-- add our web resources -->
+    <web-resource key="qanda-resources" name="qanda Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="qanda.css" location="/css/qanda.css"/>
+        <resource type="download" name="qanda.js" location="/js/qanda.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>atl.general</context>
+    </web-resource>
+
+    <web-resource key="qanda-gadget-resources" name="qanda Gadget Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="qanda.css" location="/css/qanda.css"/>
+        <resource type="download" name="qanda-gadget.js" location="/js/qanda-gadget.js"/>
+        <resource type="download" name="images/" location="/images"/>
+    </web-resource>
+
+    <web-resource key="qanda-admin-resources" name="qanda Admin Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="qanda.css" location="/css/qanda.css"/>
+        <resource type="download" name="images/" location="/images"/>
+        <resource type="download" name="qanda-admin.js" location="/js/qanda-admin.js"/>
+        <context>atl.general</context>
+    </web-resource>
+
+    <issue-tabpanel key="qanda-tabpanel" name="Q and A" class="ro.agrade.jira.qanda.issuepanel.QandAIssuePanel">
+        <description>Show Questions and Answers tab.</description>
+        <label key="qanda.issue-tab.label"/>
+        <resource type="velocity" name="view" location="templates/qanda-panel.vm"/>
+        <supports-ajax-load>true</supports-ajax-load>
+    </issue-tabpanel>
+
+    <project-tabpanel key="qanda-config-page" name="QandA Config Panel"
+                      class="ro.agrade.jira.qanda.admin.ProjectConfigurationPanel">
+        <description key="qanda.admin.panel.description">
+            Define expert groups to be used in your JIRA.
+        </description>
+        <label key="qanda.admin.panel.label" />
+        <order>120</order>
+        <resource type="velocity" name="view" location="templates/qandaProjectConfiguration.vm" />
+        <resource type="i18n" name="i18n" location="qandaAdmin" />
+        <param name="noTitle">false</param>
+    </project-tabpanel>
+
+    <rest key="ro.agrade.jira.qanda" path="/agrade/qanda" version="1.0">
+        <description>REST in peace interface</description>
+    </rest>
+
+    <component key="qandadaoserviceansw" class="ro.agrade.jira.qanda.dao.AnswerDataServiceImpl" public="false">
+        <interface>ro.agrade.jira.qanda.dao.AnswerDataService</interface>
+    </component>
+    <component key="qandadaoservicequest" class="ro.agrade.jira.qanda.dao.QuestionDataServiceImpl" public="false">
+        <interface>ro.agrade.jira.qanda.dao.QuestionDataService</interface>
+    </component>
+    <component key="qandaservice" class="ro.agrade.jira.qanda.QandAServiceImpl" public="true">
+        <interface>ro.agrade.jira.qanda.QandAService</interface>
+    </component>
+
+    <component key="qandadaoserviceexp" class="ro.agrade.jira.qanda.dao.ExpertGroupDataServiceImpl" public="true">
+        <interface>ro.agrade.jira.qanda.dao.ExpertGroupDataService</interface>
+    </component>
+    <component key="qandaserviceexp" class="ro.agrade.jira.qanda.ExpertGroupServiceImpl" public="true">
+        <interface>ro.agrade.jira.qanda.ExpertGroupService</interface>
+    </component>
 
     <component key="userUpgradeTask" name="User Upgrade Task"
-               class="ro.agrade.jira.qanda.plugin.UpgradeTask1_0_9" public="true">
+               class="ro.agrade.jira.qanda.plugin.UpgradeTask1_0_3" public="true">
         <interface>com.atlassian.sal.api.upgrade.PluginUpgradeTask</interface>
     </component>
 
-  <gadget key="quanda-gadget" name="Question Stream" location="gadget/qanda.xml">
-    <param name="roles-required">browse</param>
-  </gadget>
-  <!-- import from the product container -->
-  <!--component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" /-->
-  <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
-  <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
-  <component-import key="txTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
-  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
-  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
-  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
-  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
-  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
-  <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
-  <component key="applicationContextProviderInjector" class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector" public="false" />
+    <gadget key="qanda-gadget" name="Question Stream" location="gadget/qanda.xml">
+        <param name="roles-required">browse</param>
+    </gadget>
+
+    <gadget key="qanda-gadget-personal" name="Your Questions" location="gadget/qanda-personal.xml">
+        <param name="roles-required">browse</param>
+    </gadget>
+
+    <webwork1 key="qanda-webwork-actions" name="WebWork Actions">
+        <actions>
+            <action name="ro.agrade.jira.qanda.admin.AddEditExpertGroupAction" alias="ExpertGroups">
+                <view name="input">/templates/addEditExpertGroup.vm</view>
+                <view name="success">/templates/addEditExpertGroup.vm</view>
+                <view name="error">/templates/addEditExpertGroup.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
+    <!-- import from the product container -->
+    <!--component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" /-->
+    <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
+    <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
+    <component-import key="txTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
+    <component-import key="pluginSettingsFactory"
+                      interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+    <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+    <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+    <component-import key="JiraBaseUrls" interface="com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls"/>
+    <component-import key="searchRequestService" interface="com.atlassian.jira.bc.filter.SearchRequestService" />
+
+    <component key="applicationContextProviderInjector"
+               class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector"
+               public="false"/>
+    <!-- component key="thirdPartyPluginLicenseStorageManager"
+               class="com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManagerImpl"/>
+    <component key="pluginLicenseStoragePluginInstaller"
+               class="com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginInstaller"/>
+    <component key="atlassianMarketplaceUriFactory"
+               class="com.atlassian.upm.license.storage.lib.AtlassianMarketplaceUriFactoryImpl"/>
+    <servlet name="License Servlet"
+             i18n-name-key="license-servlet.name"
+             key="license-servlet"
+             class="ro.agrade.jira.qanda.plugin.LicenseServlet">
+        <description key="license-servlet.description">The License Servlet Plugin</description>
+        <url-pattern>/ro.agrade.jira.qanda-pro/license</url-pattern>
+    </servlet -->
+
+    <workflow-validator key="qanda_validator_noopenq"
+                        name="QandA Validator: verifies that there are no open questions on the issues."
+                        class="ro.agrade.jira.qanda.workflow.WorkflowFactory">
+        <description>QandA: verifies that there are no open questions on the issues.</description>
+        <validator-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsVC</validator-class>
+        <orderable>true</orderable>
+        <unique>false</unique>
+        <deletable>true</deletable>
+        <default>false</default>
+        <resource type="velocity"
+                  name="view"
+                  location="templates/wf_validator_noopenq.vm"/>
+    </workflow-validator>
+
+    <workflow-condition key="qanda_condition_noopenq"
+                        name="QandA Condition: verifies that there are no open questions on the issues."
+                        class="ro.agrade.jira.qanda.workflow.WorkflowFactory">
+        <description>QandA Condition: verifies that there are no open questions on the issues.</description>
+        <condition-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsVC</condition-class>
+        <orderable>true</orderable>
+        <unique>false</unique>
+        <deletable>true</deletable>
+        <default>false</default>
+        <resource type="velocity"
+                  name="view"
+                  location="templates/wf_condition_noopenq.vm"/>
+    </workflow-condition>
 </atlassian-plugin>

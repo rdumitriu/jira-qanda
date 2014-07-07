@@ -7,5 +7,6 @@
 	<!-- Configuration Plugin entities -->
 	<entity-group group="default" entity="QANDAQ" />
 	<entity-group group="default" entity="QANDAA" />
+    <entity-group group="default" entity="QANDAE" />
 	
 </entitygroup>

@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created at: 6/8/12, 4:55 PM  
  * 
  * File: AsyncRunner.java

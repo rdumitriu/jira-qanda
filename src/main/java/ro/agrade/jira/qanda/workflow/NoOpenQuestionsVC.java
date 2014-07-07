@@ -16,7 +16,6 @@ import com.opensymphony.workflow.*;
 
 import ro.agrade.jira.qanda.QandAService;
 import ro.agrade.jira.qanda.Question;
-import ro.agrade.jira.qanda.plugin.LicenseUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,9 +48,6 @@ public class NoOpenQuestionsVC implements Validator, Condition {
      */
     @Override
     public boolean passesCondition(Map transientVars, Map args, PropertySet ps) {
-        if(!LicenseUtil.isLicenseValid()) {
-            return true;
-        }
         MutableIssue issue = (MutableIssue) transientVars.get("issue");
         return !checkIssueForOpenQuestions(issue);
     }
@@ -76,9 +72,6 @@ public class NoOpenQuestionsVC implements Validator, Condition {
     @Override
     public void validate(Map transientVars, Map args, PropertySet ps)
             throws InvalidInputException {
-        if(!LicenseUtil.isLicenseValid()) {
-            return;
-        }
 
         MutableIssue issue = (MutableIssue) transientVars.get("issue");
         boolean hasOpenQuestions = checkIssueForOpenQuestions(issue);

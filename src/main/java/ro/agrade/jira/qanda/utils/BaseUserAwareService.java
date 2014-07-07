@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda.utils;
@@ -41,6 +44,6 @@ public class BaseUserAwareService {
      * @return the current user
      */
     public ApplicationUser getCurrentUserObject() {
-        return authContext.getUser();
+        return authContext.getUser() != null ? authContext.getUser() : null;
     }
 }

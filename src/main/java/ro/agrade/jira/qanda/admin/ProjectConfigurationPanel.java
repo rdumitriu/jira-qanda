@@ -18,7 +18,6 @@ import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 
 import ro.agrade.jira.qanda.ExpertGroupService;
-import ro.agrade.jira.qanda.plugin.LicenseUtil;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 import ro.agrade.jira.qanda.utils.PermissionChecker;
 
@@ -65,7 +64,6 @@ public class ProjectConfigurationPanel extends AbstractProjectTabPanel {
             ret.put("canEditGlobalExperts", PermissionChecker.canEditGlobalExperts(permissionManager, ctx.getProject(),
                                                                                    JIRAUtils.toUserObject(userManager, ctx.getUser().getName())));
             ret.put("userManager", ComponentAccessor.getUserManager());
-            ret.put("licenseIsValid", LicenseUtil.isLicenseValid());
         }
         return ret;
     }

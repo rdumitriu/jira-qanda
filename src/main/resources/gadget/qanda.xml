@@ -34,7 +34,7 @@
         #requireResource("com.atlassian.jira.gadgets:common")
         #requireResource("com.atlassian.auiplugin:aui-experimental-lozenge")
         #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
-        #requireResource("ro.agrade.jira.qanda:qanda-gadget-resources")
+        #requireResource("ro.agrade.jira.qanda-pro:qanda-gadget-resources")
         #includeResources()
 
         <script type="text/javascript">
@@ -51,7 +51,7 @@
 			        onResizeAdjustHeight: true,
 			        template: function (args) {
                         args = args || {};
-			    		return QANDAGADGET.template(this, args, "__ATLASSIAN_BASE_URL__");
+			    		return QANDAGADGET.template(this, args, "__ATLASSIAN_BASE_URL__", "/rest/agrade/qanda/latest/gadget/getquestions");
 			        }
 			    }
 			});

@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 2/5/13
  */
 package ro.agrade.jira.qanda.gadget;

@@ -1,4 +1,7 @@
-/**
+/*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created at: Oct 12, 2010 8:43:06 AM
  * 
  * File: SMTPAuthenticator.java

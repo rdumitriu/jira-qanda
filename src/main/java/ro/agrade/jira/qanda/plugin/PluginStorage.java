@@ -1,18 +1,23 @@
 /*
  * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
  * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  */
 package ro.agrade.jira.qanda.plugin;
 
 import java.util.concurrent.locks.*;
 
+import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.component.ComponentAccessor;
 
+import ro.agrade.jira.qanda.ExpertGroupService;
 import ro.agrade.jira.qanda.QandAListener;
 import ro.agrade.jira.qanda.listeners.*;
+import ro.agrade.jira.qanda.utils.ApplicationContextProvider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * The plugin storage
@@ -23,12 +28,14 @@ import org.apache.commons.logging.LogFactory;
 public class PluginStorage {
     private static final Log LOG = LogFactory.getLog(PluginStorage.class);
     private static final int DEFAULT_NO_THREADS = 2;
+    public static final String CONFIG_KEY_PERMS_GROUP = "perms.group";
     public static final String CONFIG_KEY_MAIL_NO_THREADS = "mail.no.threads";
     public static final String CONFIG_KEY_MAIL_USE_QUEUE = "mail.use.queue";
     private static PluginStorage ourInstance;
     private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private PluginConfiguration config;
+    private Group qandaGroup;
     private AsyncRunner runner;
     private QandAListener [] listeners;
 
@@ -65,6 +72,16 @@ public class PluginStorage {
     private void init() {
         this.config = new PluginConfiguration();
 
+        this.qandaGroup = null;
+        //cache here the value for the QandA group, if any
+        String groupName = config.getStringConfig(CONFIG_KEY_PERMS_GROUP, null);
+        if(groupName != null) {
+            qandaGroup = ComponentAccessor.getGroupManager().getGroup(groupName);
+            if(qandaGroup == null) {
+                LOG.warn(String.format("Wrong configuration for QandA. Please define '%s' group", groupName));
+            }
+        }
+
         runner = new AsyncRunner(config.getIntConfig(CONFIG_KEY_MAIL_NO_THREADS, DEFAULT_NO_THREADS));
         LOG.debug("QandA is now initialized");
     }
@@ -88,6 +105,14 @@ public class PluginStorage {
      */
     public static PluginConfiguration getConfig() {
         return getInstance().config;
+    }
+
+    /**
+     * Gets the group if you configure it to be available only for a certain group
+     * @return the group
+     */
+    public static Group getGroup() {
+        return getInstance().qandaGroup;
     }
 
     /**
@@ -155,8 +180,10 @@ public class PluginStorage {
                                                     ComponentAccessor.getApplicationProperties());
         }
         listeners = new QandAListener[1];
-        listeners[0] = new StandardListener(ComponentAccessor.getUserManager(),
-                                            handler);
+        listeners[0] = new LicensedListener(ComponentAccessor.getUserManager(),
+                                            handler,
+                                            ApplicationContextProvider.getBean(ExpertGroupService.class),
+                                            ComponentAccessor.getWatcherManager());
     }
 
     private PluginStorage() {

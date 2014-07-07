@@ -1,5 +1,9 @@
 
 //::TODO:: better checks on texts
+//
+// Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+// or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+//
 
 var QANDA = (function () {
 
@@ -7,7 +11,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaquestiontext">'+ AJS.params.qaskLabel +'</label>';
-                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield qanda-mentionable" ';
                 html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
                 html += 'style="width:440px;" type="text" id="qandaquestiontext" name="qandaquestiontext">' + qtext + '</textarea>';
             html += '</div>';
@@ -107,7 +111,7 @@ var QANDA = (function () {
         var html = '<form class="aui">';
             html += '<div class="field-group">';
                 html += '<label for="qandaanswertext">'+ AJS.params.qanswerLabel +'</label>';
-                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield mentionable" ';
+                html += '<textarea cols="50" rows="5" class="textarea long-field wiki-textfield qanda-mentionable" ';
                 html += 'data-issuekey="' + issueKey + '" data-projectkey="' + projectKey + '" ';
                 html += 'style="width:440px;" type="text" id="qandaanswertext" name="qandaanswertext">' + atext + '</textarea>';
             html += '</div>';
@@ -406,6 +410,59 @@ var QANDA = (function () {
     }
 })();
 
+QANDA.Mention = JIRA.Mention.extend({
+    init: function () {
+        var instance = this;
+        this.listController = new AJS.MentionGroup();
+
+        this.dataSource = new JIRA.ProgressiveDataSet([], {
+            model: JIRA.MentionUserModel,
+            queryEndpoint: contextPath + "/rest/agrade/qanda/latest/mentions/search",
+            queryParamKey: "username",
+            queryData: _.bind(this._getQueryParams, this)
+        });
+        this.dataSource.matcher = function(model, query) {
+            var matches = false;
+            matches = matches || instance._stringPartStartsWith(model.get("name"), query);
+            matches = matches || instance._stringPartStartsWith(model.get("displayName"), query);
+            return matches;
+        };
+        this.dataSource.bind('respond', function(response) {
+            var results = response.results;
+            var username = response.query;
+
+            if (!username) return;
+
+            // Update the state of mentions matches
+            if (!results.length) {
+                if (username) {
+                    if (instance.dataSource.hasQueryCache(username)) {
+                        if (!instance.lastInvalidUsername || username.length <= instance.lastInvalidUsername.length) {
+                            instance.lastInvalidUsername = username;
+                        }
+                    }
+                }
+                instance.lastRequestMatch = false;
+            } else {
+                instance.lastInvalidUsername = "";
+                instance.lastValidUsername = username;
+                instance.lastRequestMatch = true;
+            }
+
+            // Set the results
+            var $suggestions = instance.generateSuggestions(results, username);
+            instance.updateSuggestions($suggestions);
+        });
+        this.dataSource.bind('activity', function(response) {
+            if (response.activity) {
+                instance.layerController._showLoading();
+            } else {
+                instance.layerController._hideLoading();
+            }
+        });
+    }
+});
+
 AJS.$(document).ready(function() {
     // the add button for questions
     AJS.$('#quanda_addquestion').live("click", function(e) {
@@ -464,10 +521,34 @@ AJS.$(document).ready(function() {
     AJS.$('.qanda-question-panel .twixi-trigger').live("click", function(){
     	QANDA.toggleAnswersBlock(AJS.$(this));
     });
-});
 
-if(JIRA && JIRA.ViewIssueTabs){
-    JIRA.ViewIssueTabs.onTabReady(function() {
-        AJS.$.extend(AJS.params,JIRA.parseOptionsFromFieldset( AJS.$("#qandaParameterContainer").find(".parameters") ))
-    })
-}
+
+    // QANDA mentions
+    var mentionsCtr = QANDA.Mention;
+    var mentionsController;
+
+    function initMentions() {
+        if (!mentionsController) {
+            mentionsController = new mentionsCtr();
+        }
+        mentionsController.textarea(this);
+    }
+
+    AJS.$(document).delegate(".qanda-mentionable", "focus", initMentions);
+    AJS.$(".qanda-mentionable").each(initMentions);
+
+    //set the title
+    if(AJS.$('#qandaparameters').length > 0 &&
+       '0' != AJS.$('#qandaparameters').attr('totalQuestions')) {
+        var t = AJS.$('#qanda-tabpanel').text();
+        t += '(' +  AJS.$('#qandaparameters').attr('unresolvedQuestions') + '/' + AJS.$('#qandaparameters').attr('totalQuestions') + ')';
+        AJS.$('#qanda-tabpanel').html('<strong>' + t + '</strong>');
+    }
+
+
+    if(JIRA && JIRA.ViewIssueTabs){
+        JIRA.ViewIssueTabs.onTabReady(function() {
+            AJS.$.extend(AJS.params,JIRA.parseOptionsFromFieldset( AJS.$("#qandaParameterContainer").find(".parameters") ))
+        })
+    }
+});

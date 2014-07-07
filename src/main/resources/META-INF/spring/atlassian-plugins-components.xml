@@ -14,21 +14,48 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
                 autowire="default"
                 class="ro.agrade.jira.qanda.dao.QuestionDataServiceImpl"/>
 
+    <beans:bean id="qandadaoserviceexp"
+                autowire="default"
+                class="ro.agrade.jira.qanda.dao.ExpertGroupDataServiceImpl"/>
+
     <beans:bean id="qandaservice"
                 autowire="default"
                 class="ro.agrade.jira.qanda.QandAServiceImpl"/>
+
+    <beans:bean id="qandaexpservice"
+                autowire="default"
+                class="ro.agrade.jira.qanda.ExpertGroupServiceImpl"/>
+
 
     <beans:bean id="applicationContextProviderInjector"
                 autowire="default"
                 class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector"/>
 
+    <beans:bean id="thirdPartyPluginLicenseStorageManager"
+                autowire="default"
+                class="com.atlassian.upm.license.storage.lib.ThirdPartyPluginLicenseStorageManagerImpl"/>
+
+    <beans:bean id="pluginLicenseStoragePluginInstaller"
+                autowire="default"
+                class="com.atlassian.upm.license.storage.lib.PluginLicenseStoragePluginInstaller"/>
+
+    <beans:bean id="atlassianMarketplaceUriFactory"
+                autowire="default"
+                class="com.atlassian.upm.license.storage.lib.AtlassianMarketplaceUriFactoryImpl"/>
+
     <beans:bean id="userUpgradeTask"
                 autowire="default"
-                class="ro.agrade.jira.qanda.plugin.UpgradeTask1_0_9"/>
+                class="ro.agrade.jira.qanda.plugin.UpgradeTask1_0_3"/>
 
     <osgi:service id="qandaservice_osgiService" ref="qandaservice">
         <osgi:interfaces>
             <beans:value>ro.agrade.jira.qanda.QandAService</beans:value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <osgi:service id="qandaexpservice_osgiService" ref="qandaexpservice">
+        <osgi:interfaces>
+            <beans:value>ro.agrade.jira.qanda.ExpertGroupService</beans:value>
         </osgi:interfaces>
     </osgi:service>
 
@@ -37,4 +64,6 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
             <beans:value>com.atlassian.sal.api.upgrade.PluginUpgradeTask</beans:value>
         </osgi:interfaces>
     </osgi:service>
+
+
 </beans:beans>

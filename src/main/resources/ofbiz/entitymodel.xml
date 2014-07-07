@@ -54,5 +54,23 @@
             <key-map field-name="q_id" rel-field-name="q_id"/>
         </relation>
     </entity>
+
+    <entity entity-name="QANDAE"
+            table-name="QANDAE"
+            package-name="ro.agrade.jira.quanda">
+        <description>The Experts</description>
+
+        <field name="e_id" type="numeric"/>
+        <field name="e_shortname" type="long-varchar"/>
+        <field name="e_description" type="long-varchar"/>
+        <field name="e_project" type="long-varchar"/>
+        <field name="e_userlist" type="extremely-long"/>
+
+        <prim-key field="e_id"/>
+
+        <index name="QANDAE_IDX_1" unique="true">
+            <index-field name="e_shortname"/>
+        </index>
+    </entity>
 	
 </entitymodel>

@@ -1,3 +1,7 @@
+//
+// Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+// or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+//
 
 var QANDAGADGET = (function() {
 
@@ -32,7 +36,7 @@ var QANDAGADGET = (function() {
     }
 
 
-    function getTemplate(gadget, args, baseUrl) {
+    function getTemplate(gadget, args, baseUrl, qURL) {
         // reset view
         gadget.getView().empty();
         gadget.getView().append("<div class='qanda-gadget-view'></div>");
@@ -47,7 +51,7 @@ var QANDAGADGET = (function() {
         gadget.showLoading();
         AJS.$.ajax({
             type: 'POST',
-            url: baseUrl + "/rest/agrade/qanda/latest/gadget/getquestions",
+            url: baseUrl + qURL,
             data: {
                 project: gadget.getPref("project"),
                 interval: gadget.getPref("issinterval")
@@ -81,7 +85,7 @@ var QANDAGADGET = (function() {
         
         html += "<div class='qanda-panel-item qanda-gadget-panel'>";
         html += "<span class='qandauser'>" + q.user + "&nbsp;" + gadget.getMsg("qanda.panel.asked.for.issue") + "&nbsp;</span>";
-        html += "<a class='issue-link' href='" + baseUrl + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda:qanda-tabpanel'>" + q.issueKey + " - " + q.issueSummary + "</a>";
+        html += "<a class='issue-link' href='" + baseUrl + "/browse/" + q.issueKey + "?page=ro.agrade.jira.qanda-pro:qanda-tabpanel'>" + q.issueKey + " - " + q.issueSummary + "</a>";
                      
         if(q.answered) {
         	html += "<span class='aui-lozenge aui-lozenge aui-lozenge-complete'>" + q.noAnswers + "&nbsp;";
@@ -112,8 +116,8 @@ var QANDAGADGET = (function() {
                     id: "project-field",
                     class: "aui",
                     userpref: "project",
-                    label: "Chose the project",
-                    description:"Choose the project from which you want to see questions",
+                    label: "Chose the project or filter",
+                    description:"Choose the project or filter from which you want to see questions",
                     type: "select",
                     selected: gadget.getPref("project"),
                     options: getProjects(baseUrl)
@@ -127,7 +131,7 @@ var QANDAGADGET = (function() {
                     type: "select",
                     selected: gadget.getPref("issinterval"),
                     options: getIssueInterval(baseUrl)
-                },
+                }
             ]
         };
     }

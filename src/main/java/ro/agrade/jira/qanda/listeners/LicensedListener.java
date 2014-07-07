@@ -13,7 +13,6 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 
 import ro.agrade.jira.qanda.*;
-import ro.agrade.jira.qanda.plugin.LicenseUtil;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import org.apache.commons.logging.Log;
@@ -42,9 +41,6 @@ public class LicensedListener extends StandardListener {
     @Override
     protected Set<String> calculateUserSet(QandAEvent qaEvent) {
         Set<String> ret = super.calculateUserSet(qaEvent);
-        if(!LicenseUtil.isLicenseValid()) {
-            return ret;
-        }
 
         if(qaEvent.getIssue().getAssignee() != null) {
             ret.add(qaEvent.getIssue().getAssigneeId());
@@ -68,9 +64,6 @@ public class LicensedListener extends StandardListener {
 
     @Override
     protected void handleUnknownMention(String s, QandAEvent qaEvent) {
-        if(!LicenseUtil.isLicenseValid()) {
-            return;
-        }
         ExpertGroup group = service.getExpertGroup(s);
         if(group != null) {
             List<String> experts = group.getGroupMembers();

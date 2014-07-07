@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda.dao;
@@ -186,7 +189,7 @@ public class AnswerDataServiceImpl extends BaseUserAwareService implements Answe
             v.setString(TEXT_FIELD, answerText);
             delegator.store(v);
         } catch(GenericEntityException e) {
-            String msg = String.format("Could not remove answer %d ?!?", aid);
+            String msg = String.format("Could not update answer %d ?!?", aid);
             LOG.error(msg);
             throw new OfbizDataException(msg, e);
         }
@@ -285,5 +288,4 @@ public class AnswerDataServiceImpl extends BaseUserAwareService implements Answe
     private static final String STATUS_FIELD = "a_status";
     private static final String TEXT_FIELD = "a_text";
     private static final String DELETED_FIELD = "a_deleted";
-
 }

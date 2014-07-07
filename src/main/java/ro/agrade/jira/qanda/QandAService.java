@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda;
@@ -22,7 +25,9 @@ public interface QandAService {
         /** 3 months */
         THREE_MONTHS ("3mo", 3),
         /** 1 month */
-        ONE_MONTH ("1mo", 1)
+        ONE_MONTH ("1mo", 1),
+        /** 1 month */
+        ALL_TIME ("-", 0)
         ;
         private String label;
         private int months;
@@ -45,6 +50,9 @@ public interface QandAService {
          * @return the past date, according to the number of months
          */
         public Date getDateFromNow() {
+            if(months == 0) {
+                return null;
+            }
             Calendar c = Calendar.getInstance();
             c.add(Calendar.MONTH, -months);
             return c.getTime();
@@ -75,11 +83,20 @@ public interface QandAService {
     /**
      * Get all the questions which are unresolved for the specified project
      *
-     * @param project the project
+     * @param prjflt the project or filter
      * @param timePeriod the time period taken into account
      * @return the project questions
      */
-    public abstract List<Question> getUnsolvedQuestionsForProject(String project, TimePeriod timePeriod);
+    public abstract List<Question> getUnsolvedQuestionsForProjectOrFilter(String prjflt, TimePeriod timePeriod);
+
+    /**
+     * Get all the questions which are unresolved for the specified project
+     *
+     * @param prjflt the project or filter
+     * @param timePeriod the time period taken into account
+     * @return the project questions
+     */
+    public abstract List<Question> getMyUnsolvedQuestionsForProjectOrFilter(String prjflt, TimePeriod timePeriod);
 
     /**
      * Be given a question, this routine adds it into the description of the issue

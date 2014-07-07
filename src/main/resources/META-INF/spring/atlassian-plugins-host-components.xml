@@ -67,12 +67,42 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
         </beans:property>
     </beans:bean>
 
+    <beans:bean id="projectManager" lazy-init="true"
+                class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=projectManager)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.jira.project.ProjectManager</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="projectRoleManager" lazy-init="true"
+                class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=projectRoleManager)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.jira.security.roles.ProjectRoleManager</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="groupManager" lazy-init="true"
+                class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=groupManager)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.jira.security.groups.GroupManager</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
     <beans:bean id="userManager" lazy-init="true"
                 class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
         <beans:property name="filter" value="(&amp;(bean-name=userManager)(plugins-host=true))"/>
         <beans:property name="interfaces">
             <beans:list>
-                <beans:value>com.atlassian.jira.user.util.UserManager</beans:value>
+                <beans:value>com.atlassian.sal.api.user.UserManager</beans:value>
             </beans:list>
         </beans:property>
     </beans:bean>
@@ -117,4 +147,16 @@ http://www.springframework.org/schema/osgi http://www.springframework.org/schema
             </beans:list>
         </beans:property>
     </beans:bean>
+
+    <beans:bean id="searchRequestService" lazy-init="true"
+                class="com.atlassian.plugin.osgi.bridge.external.HostComponentFactoryBean">
+        <beans:property name="filter" value="(&amp;(bean-name=searchRequestService)(plugins-host=true))"/>
+        <beans:property name="interfaces">
+            <beans:list>
+                <beans:value>com.atlassian.jira.bc.filter.SearchRequestService</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+
 </beans:beans>

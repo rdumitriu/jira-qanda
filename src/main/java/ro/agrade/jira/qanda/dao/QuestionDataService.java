@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda.dao;
@@ -34,9 +37,10 @@ public interface QuestionDataService {
      * Gets all unresolved questions
      *
      * @param issueIds the project
+     * @param user the owner of the questions, can be null
      * @return the questions for the project which are not resolved, if any
      */
-    public abstract List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds);
+    public abstract List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds, String user);
 
     /**
      * Add a question

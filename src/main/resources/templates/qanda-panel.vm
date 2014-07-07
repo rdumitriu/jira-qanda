@@ -4,7 +4,9 @@
     <div id="qandaparameters" class="hidden"
          baseUrl="$baseJIRAURL"
          issueKey="$issue.key"
-         projectKey="$issue.project.name"></div>
+         projectKey="$issue.project.name"
+         unresolvedQuestions="$stats.unresolved"
+         totalQuestions="$stats.total"></div>
 	<div class="qanda-preamble qanda-panel-item">
 	    
 	    <div id='qanda_addbutton' class="aui-toolbar" style="display: inline;">
@@ -127,4 +129,4 @@
 
   </fieldset>
 </form>
-
+	

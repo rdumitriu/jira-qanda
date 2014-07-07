@@ -1,11 +1,13 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/19/13
  */
 package ro.agrade.jira.qanda.issuepanel;
 
 import java.util.*;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.issuetabpanel.AbstractIssueAction;
 import com.atlassian.jira.plugin.issuetabpanel.IssueTabPanelModuleDescriptor;
@@ -29,6 +31,7 @@ public class QandAIssueAction extends AbstractIssueAction {
     private final ApplicationUser currentUser;
     private final String jiraBaseUrl;
     private final UIFormatter uiFormatter;
+    private final QandAStatistics stats;
 
     public QandAIssueAction(final IssueTabPanelModuleDescriptor descriptor,
                             final Issue issue,
@@ -37,6 +40,7 @@ public class QandAIssueAction extends AbstractIssueAction {
                             final boolean canOverrideActions,
                             final boolean canAddToIssueDescription,
                             final String jiraBaseUrl,
+                            final QandAStatistics stats,
                             final UIFormatter uiFormatter) {
         super(descriptor);
         this.issue = issue;
@@ -46,6 +50,7 @@ public class QandAIssueAction extends AbstractIssueAction {
         this.canAddToIssueDescription = canAddToIssueDescription;
         this.jiraBaseUrl = jiraBaseUrl;
         this.uiFormatter = uiFormatter;
+        this.stats = stats;
     }
 
     @Override
@@ -58,10 +63,11 @@ public class QandAIssueAction extends AbstractIssueAction {
     protected void populateVelocityParams(Map map) {
         map.put("overrideActions", canOverrideActions);
         map.put("addToIssueDescription", canAddToIssueDescription);
-        map.put("currentUser", currentUser);
+        map.put("currentUser", currentUser.getDirectoryUser());
         map.put("baseJIRAURL", jiraBaseUrl);
         map.put("issue", issue);
         map.put("uiFormatter", uiFormatter);
         map.put("question", question);
+        map.put("stats", stats);
     }
 }

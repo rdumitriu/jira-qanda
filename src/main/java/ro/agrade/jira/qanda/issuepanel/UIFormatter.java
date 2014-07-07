@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/19/13
  */
 package ro.agrade.jira.qanda.issuepanel;
@@ -6,6 +9,7 @@ package ro.agrade.jira.qanda.issuepanel;
 import java.text.*;
 import java.util.*;
 
+import com.atlassian.core.util.HTMLUtils;
 import com.atlassian.jira.avatar.Avatar.Size;
 import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -15,9 +19,15 @@ import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.JiraVelocityHelper;
+import com.atlassian.jira.util.JiraVelocityUtils;
+import com.atlassian.velocity.JiraVelocityManager;
+import com.atlassian.velocity.VelocityHelper;
 import com.atlassian.velocity.htmlsafe.HtmlSafe;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import com.atlassian.velocity.htmlsafe.HtmlSafeAnnotationUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import org.apache.commons.logging.Log;

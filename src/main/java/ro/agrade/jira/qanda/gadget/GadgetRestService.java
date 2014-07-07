@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/21/13
  */
 package ro.agrade.jira.qanda.gadget;
@@ -8,9 +11,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import com.atlassian.jira.avatar.AvatarService;
+import com.atlassian.jira.bc.filter.SearchRequestService;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.*;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
+import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.*;
 import com.atlassian.jira.user.ApplicationUser;
@@ -40,6 +45,7 @@ public class GadgetRestService {
 	private final ApplicationProperties properties;
 	private final AvatarService avatarService;
 	private final UserManager userManager;
+    private final SearchRequestService searchRequestService;
 
     public GadgetRestService(final QandAService service,
                              final RendererManager rendererMgr,
@@ -48,6 +54,7 @@ public class GadgetRestService {
                              final PermissionManager permMgr,
                              final ApplicationProperties appProps,
                              final AvatarService avatarServ,
+                             final SearchRequestService searchRequestService,
                              final UserManager userMgr) {
         this.service = service;
         this.rendererMgr = rendererMgr;
@@ -57,6 +64,7 @@ public class GadgetRestService {
 		this.properties = appProps;
 		this.avatarService = avatarServ;
 		this.userManager = userMgr;
+        this.searchRequestService = searchRequestService;
     }
 
     /**
@@ -87,9 +95,9 @@ public class GadgetRestService {
     @Produces({MediaType.APPLICATION_JSON})
     public List<GadgetConfigLabel> getProjects() {
         List<GadgetConfigLabel> lbls = new ArrayList<GadgetConfigLabel>();
-        ApplicationUser user = authContext.getUser();
-        Collection<Project> browsePrj = permMgr.getProjects(Permissions.BROWSE, user);
+        Collection<Project> browsePrj = permMgr.getProjects(Permissions.BROWSE, authContext.getUser());
         if(browsePrj != null) {
+            ApplicationUser user = authContext.getUser();
             for(Project p : browsePrj) {
                 if(permMgr.hasPermission(Permissions.COMMENT_ISSUE, p, user) &&
                         permMgr.hasPermission(Permissions.BROWSE, p, user)) {
@@ -100,6 +108,20 @@ public class GadgetRestService {
                 }
             }
         }
+
+        Collection<SearchRequest> filters = searchRequestService.getOwnedFilters(authContext.getUser());
+        if(filters != null) {
+            for(SearchRequest sr : filters) {
+                GadgetConfigLabel pl = new GadgetConfigLabel();
+                pl.value = sr.getId().toString();
+                pl.label = sr.getName() +
+                        ((sr.getDescription() != null && sr.getDescription().trim().length() > 0)
+                                ? " - " + sr.getDescription()
+                                : "");
+                lbls.add(pl);
+            }
+        }
+
         Collections.sort(lbls, new Comparator<GadgetConfigLabel>() {
             @Override
             public int compare(GadgetConfigLabel o1, GadgetConfigLabel o2) {
@@ -132,7 +154,7 @@ public class GadgetRestService {
 
     /**
      * Gets the questions asked on the configured project for the given interval
-     * @param project the project
+     * @param prjflt the project or filter
      * @param interval the interval
      * @return the questions
      */
@@ -140,16 +162,42 @@ public class GadgetRestService {
     @Path("/getquestions")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
     @Produces({MediaType.APPLICATION_JSON})
-    public List<GadgetQuestion> getQuestions(@FormParam("project") String project,
+    public List<GadgetQuestion> getQuestions(@FormParam("project") String prjflt,
                                              @FormParam("interval") String interval) {
         if(LOG.isDebugEnabled()) {
-            LOG.debug("Getting questions for project:" + project + "<");
+            LOG.debug("Getting questions for project / filter:" + prjflt + "<");
         }
         QandAService.TimePeriod tp = QandAService.TimePeriod.SIX_MONTHS;
         if(interval != null && !"".equals(interval.trim())) {
             tp = QandAService.TimePeriod.valueOf(interval);
         }
-        List<Question> questions = service.getUnsolvedQuestionsForProject(project, tp);
+        List<Question> questions = service.getUnsolvedQuestionsForProjectOrFilter(prjflt, tp);
+        if(questions != null) {
+            return formatQuestions(questions);
+        }
+        return new ArrayList<GadgetQuestion>();
+    }
+
+    /**
+     * Gets the questions asked on the configured project for the given interval
+     * @param prjflt the project or filter
+     * @param interval the interval
+     * @return the questions
+     */
+    @POST
+    @Path("/getmyquestions")
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<GadgetQuestion> getMyQuestions(@FormParam("project") String prjflt,
+                                               @FormParam("interval") String interval) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Getting my questions for project / filter:" + prjflt + "<");
+        }
+        QandAService.TimePeriod tp = QandAService.TimePeriod.SIX_MONTHS;
+        if(interval != null && !"".equals(interval.trim())) {
+            tp = QandAService.TimePeriod.valueOf(interval);
+        }
+        List<Question> questions = service.getMyUnsolvedQuestionsForProjectOrFilter(prjflt, tp);
         if(questions != null) {
             return formatQuestions(questions);
         }

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
+ */
 package ro.agrade.jira.qanda.issuepanel;
 
 import com.atlassian.crowd.embedded.api.User;
@@ -57,7 +62,7 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
     @Override
     public List<IssueAction> getActions(final Issue issue, User user) {
-        webResourceManager.requireResource("ro.agrade.jira.qanda:qanda-resources");
+        webResourceManager.requireResource("ro.agrade.jira.qanda-pro:qanda-resources");
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
         ApplicationUser currentUser = authContext.getUser();
@@ -68,11 +73,13 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
 
         List<IssueAction> actions = new ArrayList<IssueAction>();
         List<Question> questions = service.loadQuestionsForIssue(issue.getKey());
-        
+
+        QandAStatistics stats = calculateStats(questions);
+
         // add first action with null Q to add title and add Q button
         actions.add(new QandAIssueAction(descriptor, issue, currentUser, null,
                                          canOverrideActions, canAddToIssue,
-                                         baseURL, formatter));
+                                         baseURL, stats, formatter));
         
         if(questions == null || questions.size() == 0){
         	return actions;
@@ -80,9 +87,19 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
         // for each Q add a new action
         for(Question q : questions) {
             actions.add(new QandAIssueAction(descriptor, issue, currentUser,  q,
-                                             canOverrideActions, canAddToIssue, baseURL, formatter));
+                                             canOverrideActions, canAddToIssue, baseURL, stats, formatter));
         }
         return actions;
+    }
+
+    private QandAStatistics calculateStats(List<Question> questions) {
+        int unresolved = 0;
+        for(Question q : questions) {
+            if(!q.isClosed()) {
+                unresolved ++;
+            }
+        }
+        return new QandAStatistics(questions.size(), unresolved);
     }
 
     @Override

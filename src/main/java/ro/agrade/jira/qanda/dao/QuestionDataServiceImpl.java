@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 1/28/13
  */
 package ro.agrade.jira.qanda.dao;
@@ -90,7 +93,7 @@ public class QuestionDataServiceImpl extends BaseUserAwareService implements Que
      * @return the questions for the project which are not resolved, if any
      */
     @Override
-    public List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds) {
+    public List<Question> getUnresolvedQuestionsForIssues(List<Long> issueIds, String user) {
         try {
             List<Question> results = new ArrayList<Question>();
             int i = 0;
@@ -105,6 +108,9 @@ public class QuestionDataServiceImpl extends BaseUserAwareService implements Que
                     List<EntityCondition> conds = new ArrayList<EntityCondition>();
                     conds.add(new EntityExpr(STATUS_FIELD, EntityOperator.EQUALS, translateStatusToCode(QuestionStatus.OPEN)));
                     conds.add(new EntityExpr(DELETED_FIELD, EntityOperator.EQUALS, "N"));
+                    if(user != null) {
+                        conds.add(new EntityExpr(USER_FIELD, EntityOperator.EQUALS, user));
+                    }
                     conds.add(new EntityExpr(ISSUEID_FIELD, EntityOperator.IN, subqids));
 
                     List<GenericValue> list = delegator.findByAnd(ENTITY, conds);
@@ -169,7 +175,7 @@ public class QuestionDataServiceImpl extends BaseUserAwareService implements Que
             v.setString(TEXT_FIELD, questionText);
             delegator.store(v);
         } catch(GenericEntityException e) {
-            String msg = String.format("Could not remove question %d ?!?", qid);
+            String msg = String.format("Could not update question %d ?!?", qid);
             LOG.error(msg);
             throw new OfbizDataException(msg, e);
         }

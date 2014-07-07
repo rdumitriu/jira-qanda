@@ -2,45 +2,41 @@
 The text below is the plugin description on Atlassian Marketplace
 =================================================================
 
-Was ever your comment actually a question ? Was ever your question lost in
-the tons of email notifications from JIRA ? If yes, this plugin is for you.
+QandA is a collaboration tool between the programmers and certain experts in a
+given field and / or customers. What it does is that it imposes a little bit of formalism when adding
+questions to your issues and when responding to them, thus focusing teams and
+experts alike to resolve unknowns before the coding starts.
 
-What it adds to your JIRA is a little bit of formalism when asking questions
-and when responding to them. If your team does Agile in an unknown field, you
-need this, trust me. If you have many questions like 'Do you want it blue
-or purple?' you will want it badly.
+Using QandA will lower the quantity of impeding issues in your projects; it helps
+also the project managers and SCRUM masters by reducing the communication proxy tasks,
+inherent to any project, big or small. Underspecified environments, such as Agile
+projects (but this 'underspecified' attribute applies as well to large categories of
+Waterfall projects) will simply go smoother using QandA.
 
-How was this plugin born ? My use case.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Once the question is clarified, answers - and the question that generated them - can be
+added into your issue description with a simple click, thus making the resolution more
+visible in your issue specification.
 
-Well, I have a SCRUM project: a chemistry one. We had to put molecules and
-mass-spectra on screen, manipulate them, search for similarities, isomers,
-deal with various chemistry problems, and so on.
+This plugin appeared as a necessity in a real project; you will find the original
+motivation here: https://github.com/rdumitriu/jira-qanda/wiki/Motivation
 
-You can imagine that none from my team - including me - was ready to cope with
-so much chemistry information (both my parents are chemists, so I absolutely
-hated organic chemistry back in high-school!... not anymore the case, but that
-part is lost anyway ..).
-Anyway, in this project, I had the luck to deal with some world-class chemists.
-Apart from being nice human beings, they had almost an infinite patience
-explaining us some concepts. I opened our JIRA to them, so the teams can quickly
-communicate (BTW, the chemists absolutely LOVE JIRA!).
+QandA PRO is the same great plugin as its completely free version [::TODO:: link here]
+but adds several features you will love:
 
-However, it became soon obvious that commenting or altering the description of
-the issue is not enough. We needed some kind of formalism so we can keep track
-of our chemistry ignorance in the project.
+1. QandA PRO is far more aggressive with the notifications; each question or answers
+notifies the reporter, the assignee and the watchers automatically, besides the users
+mentioned in the question and the answers;
 
-This is how this plugin was born.
+2. QandA PRO offers global and per project expert groups. Instead of mentioning all the
+people, one by one, you simply will mention: @expertgroup;
 
-How it is used ?
-~~~~~~~~~~~~~~~~
+3. QandA PRO offers additional gadgets and configuration options;
 
-Once installed, it gives you an extra panel on your issues: the questions panel.
-People can use that panel to add questions related to the issue and receive
-answers. Once one or more answers are approved, questions can be added to the
-description of the issue by a simple click.
+4. QandA PRO provides workflow integration, you can block an issue advancement in the
+workflow if there are open questions; for this purpose we provide both a condition and
+a validator.
 
-To keep track of the unresolved questions, a gadget is provided. It looks for
-issues in the specified time interval - check the configuration - and shows you
-unresolved questions. Having it near your activity stream will point out very
-quickly what piece of info is missing to the developer.
+Please read the wiki to understand how it works: https://github.com/rdumitriu/jira-qanda/wiki
+For a detailed description of paid version, check: [::TODO:: link here]
+
+Get in touch with us: http://goo.gl/J29jC (Yeap, a vote on facebook helps!)

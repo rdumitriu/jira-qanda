@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created at Sep 16, 2010T4:53:29 PM+02.
  *
  * File: AbstractPluginLifecycleActivator.java
@@ -50,7 +53,9 @@ public class PluginBundleActivator implements BundleActivator {
      */
     public void start(BundleContext bundleContext) {
         registerAdditionalDbResources();
-        PluginStorage.getConfig();
+        // we need to lazy load this because our components
+        // are not yet initialized at bundle start()
+//        PluginStorage.getInstance().init();
     }
 
     /**

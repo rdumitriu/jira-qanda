@@ -1,14 +1,17 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 6/4/13
  */
 package ro.agrade.jira.qanda.listeners;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.i18n.JiraI18nResolver;
 import com.atlassian.jira.issue.fields.renderer.IssueRenderContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.templaterenderer.TemplateRenderer;
@@ -41,7 +44,7 @@ public abstract class AbstractEmailMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void handleMessage(User user, QandAEvent qaEvent) {
+    public void handleMessage(ApplicationUser user, QandAEvent qaEvent) {
         if(user == null || user.getEmailAddress() == null) {
             LOG.warn(String.format("Cannot sent mail to user %s", user != null ? user.getEmailAddress() : "-?-"));
             return;
@@ -54,11 +57,11 @@ public abstract class AbstractEmailMessageHandler implements MessageHandler {
      * Our beloved mail task
      */
     class EmailTask implements Runnable {
-        private User user;
+        private ApplicationUser user;
         private QandAEvent qaEvent;
         private final I18nResolver i18nResolver;
 
-        EmailTask(User user, QandAEvent qaEvent) {
+        EmailTask(ApplicationUser user, QandAEvent qaEvent) {
             this.user = user;
             this.qaEvent = qaEvent;
             //this is stupid, it cannot be resolved by ComponentAccessor ?!? crazy stuff here, my friend

@@ -1,5 +1,8 @@
-/**
- * Created with IntelliJ IDEA.
+/*
+ *
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Date: 6/17/13
  * Time: 11:28 PM
  */

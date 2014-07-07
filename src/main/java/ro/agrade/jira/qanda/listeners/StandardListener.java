@@ -1,16 +1,18 @@
 /*
+ * Copyright (c) AGRADE Software. Please read src/main/resources/META-INF/LICENSE
+ * or online document at: https://github.com/rdumitriu/jira-qanda/wiki/LICENSE
+ *
  * Created on 6/4/13
  */
 package ro.agrade.jira.qanda.listeners;
 
 import java.util.*;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 
-import ro.agrade.jira.qanda.QandAEvent;
-import ro.agrade.jira.qanda.QandAListener;
+import ro.agrade.jira.qanda.*;
+import ro.agrade.jira.qanda.utils.JIRAUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +46,27 @@ public class StandardListener implements QandAListener {
                                     qaEvent.getIssueKey(),
                                     qaEvent.getUser() != null ? qaEvent.getUser().getDisplayName() : ""));
         }
+        Set<String> extractedUsers = calculateUserSet(qaEvent);
+
+        for(String s : extractedUsers) {
+            handleNotify(s, qaEvent);
+        }
+    }
+
+    public MessageHandler getHandler() {
+        return handler;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
+    }
+
+    /**
+     * Calculates the user set
+     * @param qaEvent the event
+     * @return the set of users to be notified
+     */
+    protected Set<String> calculateUserSet(QandAEvent qaEvent) {
         //1: extract users
         Set<String> extractedUsers = new HashSet<String>();
         extractUsersFromText(qaEvent.getPreambleText(), extractedUsers);
@@ -52,14 +75,21 @@ public class StandardListener implements QandAListener {
         if(qaEvent.getAdditionalUsers() != null) {
             extractedUsers.addAll(qaEvent.getAdditionalUsers());
         }
+
         //2: remove current user (or should I still send it?)
         if(qaEvent.getUser() != null) {
             extractedUsers.remove(qaEvent.getUser().getName());
         }
+        return extractedUsers;
+    }
 
-        for(String s : extractedUsers) {
-            handleNotify(s, qaEvent);
-        }
+    /**
+     * Handles the unknown mention. By default, does nothing
+     *
+     * @param s the unknown mention
+     * @param qaEvent the event
+     */
+    protected void handleUnknownMention(String s, QandAEvent qaEvent) {
     }
 
     private void extractUsersFromText(String text, Set<String> extractedUsers) {
@@ -72,12 +102,15 @@ public class StandardListener implements QandAListener {
     }
 
     private void handleNotify(String s, QandAEvent qaEvent) {
-        User user = toUserObject(s);
+        ApplicationUser user = JIRAUtils.toUserObject(userManager, s);
         if(user != null) {
             if(LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Notify user %s on event %s", s, qaEvent.getType()));
             }
             handler.handleMessage(user, qaEvent);
+        } else { //user was null, maybe it's a group
+            handleUnknownMention(s, qaEvent);
+
         }
     }
 
@@ -110,13 +143,5 @@ public class StandardListener implements QandAListener {
             }
         }
         return ret.size() == 0 ? null : ret;
-    }
-
-    private User toUserObject(String uNameOrKey) {
-        ApplicationUser appUser = userManager.getUserByKey(uNameOrKey);
-        if(appUser == null) {
-            appUser = userManager.getUserByName(uNameOrKey);
-        }
-        return appUser != null ? appUser.getDirectoryUser() : null;
     }
 }
