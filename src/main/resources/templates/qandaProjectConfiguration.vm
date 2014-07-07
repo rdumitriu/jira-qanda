@@ -1,0 +1,79 @@
+#enable_html_escaping()
+
+#if(!$licenseIsValid)
+    <div class="aui-message warning">
+        <p class="title">
+            <span class="aui-icon icon-warning"></span>
+            <strong>$i18n.getText("qanda.panel.license.error.title")</strong>
+        </p>
+        <p>$i18n.getText("qanda.panel.license.error.message")</p>
+    </div>
+#end
+
+    <style>
+        #members_container .suggestions {
+            width: 360px;
+        }
+    </style>
+
+    #if($licenseIsValid && ($canEditProjectExperts || $canEditGlobalExperts))
+        <a href="$!baseurl/secure/ExpertGroups!add.jspa?project=$projectKey" class="aui-button qanda-trigger-dialog" id="create-eg-trigger" title="" style="float: right; margin-top: -25px;">
+            $i18n.getText('qanda.config.section.add')
+        </a>
+    #end
+    <br/>
+
+    #if ( !$expertLists )
+        <div class="aui-message error">
+            <p class="title">
+                <span class="aui-icon icon-error"></span>
+                <strong>$i18n.getText("qanda.panel.error")</strong>
+            </p>
+            <p>$i18n.getText("qanda.panel.error.no.project")</p>
+        </div>
+    #elseif( $expertLists.size() == 0 )
+        <div class="aui-message info">
+            <p class="title">
+                <span class="aui-icon icon-info"></span>
+                <strong>$i18n.getText("qanda.panel.no.groups.title")</strong>
+            </p>
+            <p>$i18n.getText("qanda.panel.no.groups.message")</p>
+        </div>
+    #else
+        <table class="aui">
+        <thead>
+            <tr>
+                <th>$i18n.getText("qanda.panel.table.header.name")</th>
+                <th>$i18n.getText("qanda.panel.table.header.members")</th>
+                <th>$i18n.getText("qanda.panel.table.header.actions")</th>
+            </tr>
+        </thead>
+        <tbody>
+        #foreach($lst in $expertLists)
+            <tr>
+                <td>$lst.name <br />#if($lst.global) ($i18n.getText("qanda.panel.global")) #end</td>
+                <td>
+                #set($counter = 0)
+                #foreach($member in $lst.groupMembers)
+                    #set($counter = $counter + 1)
+                    <span class="user-hover" rel="$member">$userManager.getUser($member).getDisplayName()</span>
+                    #if($counter < $lst.groupMembers.size())
+                        ,
+                    #end
+                #end
+                </td>
+                <td>
+                    #if($licenseIsValid && ((!$lst.global && $canEditProjectExperts) || ($lst.global && $canEditGlobalExperts)))
+                        <a class="qanda-trigger-dialog" href="$!baseurl/secure/ExpertGroups!edit.jspa?egId=$lst.id&project=$projectKey">$i18n.getText("qanda.panel.edit")</a>
+                        &nbsp;|&nbsp;
+                        <a class="qanda-confirm-delete" href="$!baseurl/secure/ExpertGroups!delete.jspa?egId=$lst.id&project=$projectKey">$i18n.getText("qanda.panel.delete")</a>
+                    #else
+                        $i18n.getText("qanda.panel.no.actions")
+                    #end
+                </td>
+            </tr>
+        #end
+        </tbody>
+        </table>
+
+    #end

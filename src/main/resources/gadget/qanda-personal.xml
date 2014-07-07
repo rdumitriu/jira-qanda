@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+    <ModulePrefs title="__MSG_qanda.gadget.personal.title__"
+                 directory_title="__MSG_qanda.gadget.personal.directory.title__"
+                 description="__MSG_qanda.gadget.personal.description__"
+                 author="__MSG_qanda.gadget.author__"
+                 author_affiliation="__MSG_qanda.gadget.author.affiliation__"
+                 author_location="__MSG_qanda.gadget.author.location__" 
+                 height="100"
+                 >
+        <Optional feature="gadget-directory">
+            <Param name="categories">
+                JIRA
+                Wallboard
+                Collaboration
+            </Param>
+        </Optional>
+        <Optional feature="atlassian.util" />
+        <Optional feature="auth-refresh" />
+        <Require feature="views" />
+        <Require feature="setprefs" />
+        <Require feature="dynamic-height"/>
+        <Require feature="oauthpopup" />
+        #oauth
+        #supportedLocales("gadget.common,qanda")
+    </ModulePrefs>
+    <UserPref name="refresh" datatype="hidden" default_value="false" />
+    <UserPref name="isConfigured" datatype="hidden" default_value="true" />
+    <UserPref name="project" datatype="hidden" />
+    <UserPref name="issinterval" datatype="hidden" />
+    <Content type="html" view="canvas,default">
+        <![CDATA[
+
+        #requireResource("com.atlassian.jira.gadgets:common")
+        #requireResource("com.atlassian.auiplugin:aui-experimental-lozenge")
+        #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+        #requireResource("ro.agrade.jira.qanda-pro:qanda-gadget-resources")
+        #includeResources()
+
+        <script type="text/javascript">
+            AJS.Gadget({
+			    baseUrl: "__ATLASSIAN_BASE_URL__",
+			    useOauth: "/rest/gadget/1.0/currentUser",
+			    config: {
+                    descriptor: function (args) {
+                        return QANDAGADGET.descriptor(this, args, "__ATLASSIAN_BASE_URL__");
+                    }
+                },
+			    view: {
+			        enableReload: true,
+			        onResizeAdjustHeight: true,
+			        template: function (args) {
+                        args = args || {};
+			    		return QANDAGADGET.template(this, args, "__ATLASSIAN_BASE_URL__", "/rest/agrade/qanda/latest/gadget/getmyquestions");
+			        }
+			    }
+			});
+        </script>
+        ]]>
+    </Content>
+</Module>

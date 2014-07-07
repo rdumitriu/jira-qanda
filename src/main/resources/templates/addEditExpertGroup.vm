@@ -1,0 +1,121 @@
+#enable_html_escaping()
+
+#macro (auimessage $message $title $class)
+    <div class="aui-message $class">
+        <p class="title">
+            <span class="aui-icon icon-$class"></span>
+            <strong>$title</strong>
+        </p>
+        <p>$message</p>
+    </div>
+#end
+
+#set($edit = $egIdAsLong > 0)
+<html>
+<head>
+    #if($edit)
+        #set($title = $i18n.getText('qanda.edit.expert.group.title'))
+    #else
+        #set($title = $i18n.getText('qanda.add.expert.group.title'))
+    #end
+    <title>$title</title>
+    <meta content="panel-general" name="decorator">
+    <style>
+        #members_container .suggestions {
+            width: 360px;
+        }
+    </style>
+</head>
+<body>
+<form class="aui" method="post" name="jiraform" action="ExpertGroups!save.jspa">
+    <div class="form-body">
+        <h2>$title</h2>
+        <input type="hidden" id="egId" name="egId" value="$!egId">
+        <input type="hidden" id="projKey" name="project" value="$!project">
+        #if($hasErrorMessages)
+            #foreach($errMsg in $errorMessages)
+                #auimessage($errMsg "Error" "error")
+            #end
+            <br/>
+        #end
+
+        ##-------------------------------------------------------------
+        ##  Name
+        ##-------------------------------------------------------------
+        <div class="field-group">
+            <label for="name">
+                $i18n.getText('qanda.eg.name.label')
+                <span class="aui-icon icon-required"></span>
+            </label>
+            <input class="text long-field"
+                   type="text"
+                   id="name"
+                   name="name"
+                   value="$!name" />
+            <div class="description">$i18n.getText('qanda.eg.name.description')</div>
+        </div>
+
+        ##-------------------------------------------------------------
+        ##  Description
+        ##-------------------------------------------------------------
+        <div class="field-group">
+            <label for="name">
+                $i18n.getText('qanda.eg.description.label')
+            </label>
+            <textarea class="textarea long-field"
+                      id="description"
+                      name="description">$!description</textarea>
+            <div class="description">$i18n.getText('qanda.eg.description.description')</div>
+        </div>
+
+        ##-------------------------------------------------------------
+        ##  Members
+        ##-------------------------------------------------------------
+        <div class="field-group">
+            <fieldset rel="members" class="hidden user-picker-params">
+                <input title="formName" type="hidden" value="jiraform">
+                <input title="fieldName" type="hidden" value="members">
+                <input title="multiSelect" type="hidden" value="true">
+                <input title="userPickerEnabled" type="hidden" value="true">
+            </fieldset>
+            <label for="members">
+                $i18n.getText('qanda.eg.members.label')
+                <span class="aui-icon icon-required"></span>
+            </label>
+            <div class="ajax_autocomplete" id="members_container">
+                <textarea class="textarea long-field" cols="40" id="members" name="members" rows="3">$!members</textarea>
+                <div>
+                    <a class="popup-trigger" href="#">
+                        <img alt="" height="16" name="multiuserImage" src="$baseurl/images/icons/filter_public.gif" title="Select user(s)" width="16">
+                    </a>
+                </div>
+                <div id="members_results" class="ajax_results"></div>
+                <div class="fieldDescription">$i18n.getText('qanda.eg.members.description')</div>
+            </div>
+        </div>
+
+        ##-------------------------------------------------------------
+        ##  is global
+        ##-------------------------------------------------------------
+        <div class="field-group">
+            <label for="isGlobal">
+                $i18n.getText('qanda.eg.isGlobal.label')
+            </label>
+            <input type="checkbox" id="isGlobal" name="isGlobal" value="true" #if($!isGlobal == "true") checked #end />
+            <div class="description">$i18n.getText('qanda.eg.isGlobal.description')</div>
+        </div>
+    </div>
+    <div class="buttons-container form-footer">
+        <div class="buttons">
+            #if($edit)
+                <input class="aui-button" id="qanda-edit-submit" value="$i18n.getText('qanda.eg.edit.submit')"  type="submit" name="edit" />
+            #else
+                <input class="aui-button" id="qanda-create-submit" value="$i18n.getText('qanda.eg.new.submit')"  type="submit" name="save" />
+            #end
+            <a class="aui-button aui-button-link cancel" href="$baseurl/browse/$project#selectedTab=ro.agrade.jira.qanda-pro%3Aqanda-config-page">$i18n.getText('qanda.eg.cancel')</a>
+        </div>
+    </div>
+</form>
+</body>
+</html>
+
