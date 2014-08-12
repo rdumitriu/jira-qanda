@@ -413,7 +413,11 @@ var QANDA = (function () {
 QANDA.Mention = JIRA.Mention.extend({
     init: function () {
         var instance = this;
-        this.listController = new AJS.MentionGroup();
+        if (JIRA.Version.isGreaterThanOrEqualTo("6.3")) {
+            this.listController = new JIRA.MentionGroup();
+        } else {
+            this.listController = new AJS.MentionGroup();
+        }
 
         this.dataSource = new JIRA.ProgressiveDataSet([], {
             model: JIRA.MentionUserModel,

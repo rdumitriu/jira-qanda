@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ro.agrade.jira</groupId>
     <artifactId>qanda-pro</artifactId>
-    <version>1.0.4-j6</version>
+    <version>1.0.5-j6</version>
 
     <organization>
         <name>AGRADE</name>
@@ -26,7 +26,7 @@
     </developers>
 
     <name>QandA PRO</name>
-    <description>The Questions and Answers plugin - paid version</description>
+    <description>The Questions and Answers plugin</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -132,8 +132,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
@@ -179,9 +179,9 @@
     </build>
 
     <properties>
-        <jira.version>6.0</jira.version>
-        <jira.data.version>6.0</jira.data.version>
-        <amps.version>4.1.4</amps.version>
+        <jira.version>6.3</jira.version>
+        <jira.data.version>6.3</jira.data.version>
+        <amps.version>5.0.4</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>

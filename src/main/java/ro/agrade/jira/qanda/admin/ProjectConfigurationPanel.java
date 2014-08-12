@@ -64,6 +64,7 @@ public class ProjectConfigurationPanel extends AbstractProjectTabPanel {
             ret.put("canEditGlobalExperts", PermissionChecker.canEditGlobalExperts(permissionManager, ctx.getProject(),
                                                                                    JIRAUtils.toUserObject(userManager, ctx.getUser().getName())));
             ret.put("userManager", ComponentAccessor.getUserManager());
+            ret.put("licenseIsValid", true);
         }
         return ret;
     }

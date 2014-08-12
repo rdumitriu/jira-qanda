@@ -10,7 +10,6 @@
         <param name="plugin-banner">images/banner.png</param>
         <param name="vendor-icon">images/vendor_icon_16.png</param>
         <param name="vendor-logo">images/vendor_logo_72.png</param>
-        <param name="atlassian-licensing-enabled">true</param>
     </plugin-info>
 
     <!-- add our i18n resource -->
