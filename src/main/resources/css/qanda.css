@@ -35,7 +35,7 @@
 .qandauser .user-hover.user-avatar {
 	background-repeat: no-repeat;
 	background-position: center left;
-	padding: 2px 0 2px 19px;
+	padding: 2px 0 2px 24px;
 }
 
 .qanda-question-thread {
@@ -64,6 +64,8 @@
 
 .qanda-panel-item:hover .actions-toolbar {
     display : block;
+	margin-top: -2px;
+	margin-right: 5px;
 }
 
 .qanda-panel-item .actions-toolbar .toolbar-action {

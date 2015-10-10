@@ -559,7 +559,7 @@ public class QandAServiceImpl extends BaseUserAwareService implements QandAServi
         ImportUtils.setIndexIssues(true);
         try {
             // updateIssue (should) also handle the re-index of the issue
-            issueManager.updateIssue(getCurrentUserObject().getDirectoryUser(), issue,
+            issueManager.updateIssue(getCurrentUserObject(), issue,
                                      EventDispatchOption.ISSUE_UPDATED,
                                      true);
             try {

@@ -103,7 +103,6 @@
     </webwork1>
 
     <!-- import from the product container -->
-    <!--component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" /-->
     <component-import key="pluginAccessor" interface="com.atlassian.plugin.PluginAccessor"/>
     <component-import key="pluginController" interface="com.atlassian.plugin.PluginController"/>
     <component-import key="txTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
@@ -116,6 +115,10 @@
     <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
     <component-import key="JiraBaseUrls" interface="com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls"/>
     <component-import key="searchRequestService" interface="com.atlassian.jira.bc.filter.SearchRequestService" />
+    <component-import key="emailFormatter" interface="com.atlassian.jira.util.EmailFormatter" />
+    <component-import key="timeZoneManager" interface="com.atlassian.jira.timezone.TimeZoneManager" />
+    <component-import key="userSearchService" interface="com.atlassian.jira.bc.user.search.UserSearchService" />
+    <component-import key="jiraAvatarSupport" interface="com.atlassian.jira.avatar.JiraAvatarSupport" />
 
     <component key="applicationContextProviderInjector"
                class="ro.agrade.jira.qanda.utils.ApplicationContextProviderInjector"
@@ -138,7 +141,7 @@
                         name="QandA Validator: verifies that there are no open questions on the issues."
                         class="ro.agrade.jira.qanda.workflow.WorkflowFactory">
         <description>QandA: verifies that there are no open questions on the issues.</description>
-        <validator-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsVC</validator-class>
+        <validator-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsV</validator-class>
         <orderable>true</orderable>
         <unique>false</unique>
         <deletable>true</deletable>
@@ -152,7 +155,7 @@
                         name="QandA Condition: verifies that there are no open questions on the issues."
                         class="ro.agrade.jira.qanda.workflow.WorkflowFactory">
         <description>QandA Condition: verifies that there are no open questions on the issues.</description>
-        <condition-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsVC</condition-class>
+        <condition-class>ro.agrade.jira.qanda.workflow.NoOpenQuestionsC</condition-class>
         <orderable>true</orderable>
         <unique>false</unique>
         <deletable>true</deletable>

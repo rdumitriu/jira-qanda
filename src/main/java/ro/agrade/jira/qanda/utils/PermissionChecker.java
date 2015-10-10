@@ -167,7 +167,7 @@ public class PermissionChecker {
                 //no configuration means that we do not care about
                 return true;
             }
-            return ComponentAccessor.getGroupManager().isUserInGroup(user.getDirectoryUser(), g);
+            return ComponentAccessor.getGroupManager().isUserInGroup(user, g);
         } catch(Exception e) {
             LOG.error(String.format("Exception while trying to establish group membership for %s", user.getUsername()));
         }

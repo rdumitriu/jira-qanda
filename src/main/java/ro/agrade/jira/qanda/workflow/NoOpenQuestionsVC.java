@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Radu Dumitriu (rdumitriu@gmail.com)
  * @since 1.0
  */
-public class NoOpenQuestionsVC implements Validator, Condition {
+public class NoOpenQuestionsVC {
 
     private static final Log LOG = LogFactory.getLog(NoOpenQuestionsVC.class);
     private QandAService service;
@@ -46,7 +46,6 @@ public class NoOpenQuestionsVC implements Validator, Condition {
      * @param ps the property set
      * @return true if condition is true, false otherwise
      */
-    @Override
     public boolean passesCondition(Map transientVars, Map args, PropertySet ps) {
         MutableIssue issue = (MutableIssue) transientVars.get("issue");
         return !checkIssueForOpenQuestions(issue);
@@ -69,7 +68,6 @@ public class NoOpenQuestionsVC implements Validator, Condition {
      * @param ps the property set
      * @throws InvalidInputException if validation fails
      */
-    @Override
     public void validate(Map transientVars, Map args, PropertySet ps)
             throws InvalidInputException {
 

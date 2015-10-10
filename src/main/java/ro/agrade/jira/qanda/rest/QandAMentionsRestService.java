@@ -8,41 +8,44 @@
  */
 package ro.agrade.jira.qanda.rest;
 
-import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.avatar.JiraAvatarSupport;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
-import com.atlassian.jira.bc.user.search.DefaultUserPickerSearchService;
-import com.atlassian.jira.bc.user.search.UserPickerSearchService;
+import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.rest.api.util.ErrorCollection;
-import com.atlassian.jira.rest.v2.issue.*;
+import com.atlassian.jira.rest.v2.issue.RESTException;
+import com.atlassian.jira.rest.v2.issue.UserBean;
+import com.atlassian.jira.rest.v2.issue.UserBeanBuilder;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.groups.GroupManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.EmailFormatter;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import ro.agrade.jira.qanda.ExpertGroup;
 import ro.agrade.jira.qanda.ExpertGroupService;
 import ro.agrade.jira.qanda.utils.JIRAUtils;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.lang.reflect.Constructor;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The REST service for autocomplete
@@ -58,49 +61,37 @@ public class QandAMentionsRestService {
     public static final int MAX_USERS_RETURNED = 1000;
 
 
-    private UserPickerSearchService upss;
+    private UserSearchService uss;
     private TimeZoneManager timeZoneManager;
     private JiraAuthenticationContext authContext;
+    private I18nHelper.BeanFactory beanFactory;
     private EmailFormatter emailFormatter;
     private ApplicationProperties appProps;
     private JiraBaseUrls jiraBaseUrls;
     private ExpertGroupService egService;
     private ProjectManager projectManager;
+    private JiraAvatarSupport jiraAvatarSupport;
 
-    public QandAMentionsRestService(final UserManager userManager,
-                                    final ApplicationProperties applicationProperties,
-                                    final PermissionManager permissionManager,
+    public QandAMentionsRestService(final ApplicationProperties applicationProperties,
+                                    final UserSearchService uss,
+                                    final TimeZoneManager timeZoneManager,
                                     final JiraAuthenticationContext authContext,
+                                    final I18nHelper.BeanFactory beanFactory,
                                     final JiraBaseUrls jiraBaseUrls,
                                     final ProjectManager projectManager,
                                     final ExpertGroupService egService,
-                                    final GroupManager groupManager,
-                                    final ProjectRoleManager projectRoleManager) {
+                                    final JiraAvatarSupport jiraAvatarSupport,
+                                    final EmailFormatter emailFormatter) {
         this.appProps = applicationProperties;
+        this.uss = uss;
+        this.timeZoneManager = timeZoneManager;
+        this.beanFactory = beanFactory;
         this.jiraBaseUrls = jiraBaseUrls;
         this.egService = egService;
         this.projectManager = projectManager;
-        this.timeZoneManager = ComponentAccessor.getComponentOfType(TimeZoneManager.class);
+        this.jiraAvatarSupport = jiraAvatarSupport;
+        this.emailFormatter = emailFormatter;
         this.authContext = authContext;
-        this.emailFormatter = ComponentAccessor.getComponentOfType(EmailFormatter.class);
-        try {
-            Constructor ct = DefaultUserPickerSearchService.class.getDeclaredConstructor(UserManager.class, ApplicationProperties.class, PermissionManager.class);
-            this.upss = (DefaultUserPickerSearchService)ct.newInstance(userManager, applicationProperties, permissionManager);
-        } catch(Throwable ex) {
-            //JIRA 6.2
-            try {
-                Constructor ct = DefaultUserPickerSearchService.class.getDeclaredConstructor(UserManager.class, ApplicationProperties.class,
-                                                                                             JiraAuthenticationContext.class, PermissionManager.class,
-                                                                                             GroupManager.class, ProjectManager.class, ProjectRoleManager.class);
-                this.upss = (DefaultUserPickerSearchService)ct.newInstance(userManager, applicationProperties,
-                                                                           authContext, permissionManager,
-                                                                           groupManager, projectManager,
-                                                                           projectRoleManager);
-            } catch(Throwable ex2) {
-                LOG.fatal("Cannot instantiate the user picker search service. We're doomed. Future calls will result in NPE!");
-            }
-
-        }
     }
 
     @Path("/search")
@@ -125,7 +116,7 @@ public class QandAMentionsRestService {
             }
         }
 
-        final List<User> page = limitUserSearch(startAt, maxResults, findUsers(username));
+        final List<ApplicationUser> page = limitUserSearch(startAt, maxResults, findUsers(username));
         List<UserBean> userBeans = makeUserBeans(page);
 
         // EGs first
@@ -139,7 +130,7 @@ public class QandAMentionsRestService {
         return new JiraServiceContextImpl(user, errorCollection);
     }
 
-    private List<User> limitUserSearch(Integer startAt, Integer maxResults, List<User> users) {
+    private List<ApplicationUser> limitUserSearch(Integer startAt, Integer maxResults, List<ApplicationUser> users) {
         int start = startAt != null ? Math.max(0, startAt) : 0;
         int end = (maxResults != null
                             ? Math.min(MAX_USERS_RETURNED, maxResults)
@@ -148,21 +139,22 @@ public class QandAMentionsRestService {
         return users.subList(start, Math.min(users.size(), end));
     }
 
-    private List<User> findUsers(final String searchString) {
+    private List<ApplicationUser> findUsers(final String searchString) {
         if (searchString == null){
             throw new RESTException(Response.Status.NOT_FOUND,
                                     ErrorCollection.of("Null search string."));
         }
-        return upss.findUsers(createContext(), searchString);
+        return uss.findUsers(createContext(), searchString);
     }
 
-    private List<UserBean> makeUserBeans(Collection<User> users) {
+    private List<UserBean> makeUserBeans(List<ApplicationUser> users) {
         List<UserBean> beans =  new ArrayList<UserBean>();
-        for (User user : users) {
-            UserBeanBuilder builder = new UserBeanBuilder(jiraBaseUrls).user(user);
-            builder.loggedInUser(authContext.getUser());
-            builder.emailFormatter(emailFormatter);
-            builder.timeZone(timeZoneManager.getLoggedInUserTimeZone());
+        for (ApplicationUser user : users) {
+            UserBeanBuilder builder = new UserBeanBuilder(jiraBaseUrls, jiraAvatarSupport).user(user);
+            builder.loggedInUser(authContext.getUser())
+                    .emailFormatter(emailFormatter)
+                    .timeZone(timeZoneManager.getLoggedInUserTimeZone())
+                    .i18nBeanFactory(beanFactory);
             beans.add(builder.buildMid());
         }
         return beans;

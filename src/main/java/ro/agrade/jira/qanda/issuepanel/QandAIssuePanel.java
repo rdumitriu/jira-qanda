@@ -61,13 +61,13 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
     }
 
     @Override
-    public List<IssueAction> getActions(final Issue issue, User user) {
+    public List<IssueAction> getActions(final Issue issue, ApplicationUser user) {
         webResourceManager.requireResource("ro.agrade.jira.qanda-pro:qanda-resources");
         webResourceManager.requireResource("com.atlassian.auiplugin:aui-experimental-lozenge");
 
         ApplicationUser currentUser = authContext.getUser();
         boolean canOverrideActions = PermissionChecker.isUserLeadOrAdmin(permissionManager, issue, currentUser);
-        boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, JIRAUtils.toUserObject(userManager, user.getName()));
+        boolean canAddToIssue = PermissionChecker.isIssueEditable(permissionManager, issue, user);
         UIFormatter formatter = new UIFormatter(userManager, authContext, avatarService, properties, rendererMgr, issue);
         String baseURL = JIRAUtils.getRelativeJIRAPath(properties);
 
@@ -103,8 +103,8 @@ public class QandAIssuePanel extends AbstractIssueTabPanel {
     }
 
     @Override
-    public boolean showPanel(Issue issue, User user) {
-        return PermissionChecker.canViewIssue(permissionManager, issue, JIRAUtils.toUserObject(userManager, user.getName()));
+    public boolean showPanel(Issue issue, ApplicationUser user) {
+        return PermissionChecker.canViewIssue(permissionManager, issue, user);
     }
 
 }
